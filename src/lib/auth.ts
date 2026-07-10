@@ -1,4 +1,4 @@
-import { SignJWT, decodeJwt, jwtVerify } from 'jose';
+import { decodeJwt } from 'jose';
 import type { JWTPayload } from 'jose';
 import { useEffect, useState } from 'react';
 import type { AuthUser } from '../types';
@@ -8,36 +8,13 @@ const KEY = 'sgpro_user';
 const AVATAR_KEY = 'sgpro_avatar';
 const TOKEN_KEY = 'sgpro_jwt';
 
-/* Must match Backend/sg-api JWT_SECRET for token verification. */
-const JWT_SECRET = new TextEncoder().encode(
-  import.meta.env.VITE_JWT_SECRET ?? 'REDACTED',
-);
-const JWT_ISSUER = import.meta.env.VITE_JWT_ISSUER ?? 'sgprogrowth-admin';
-const JWT_AUDIENCE = import.meta.env.VITE_JWT_AUDIENCE ?? 'sgprogrowth-portal';
-
-interface Account {
-  password: string;
-  role: AuthUser['role'];
-  name: string;
-}
-
-/** Offline fallback when VITE_USE_API=false */
-export const ACCOUNTS: Record<string, Account> = {
-  'maheshmd@sharvagroup.com': { password: 'REDACTED', role: 'admin', name: 'Mahesh MD' },
-};
-
-/* ----------------------------- JWT helpers ----------------------------- */
-
-export async function issueToken(user: AuthUser): Promise<string> {
-  return await new SignJWT({ name: user.name, role: user.role, email: user.email })
-    .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
-    .setSubject(user.email)
-    .setIssuer(JWT_ISSUER)
-    .setAudience(JWT_AUDIENCE)
-    .setIssuedAt()
-    .setExpirationTime('8h')
-    .sign(JWT_SECRET);
-}
+/*
+ * NOTE: This client never signs or verifies JWTs with a shared secret.
+ * Tokens are issued exclusively by the backend (/auth/login) and are only
+ * decoded here (not verified) for reading claims to drive the UI. Trust in
+ * a token's validity always comes from the backend rejecting bad/expired
+ * tokens on each API call - never from a client-side signature check.
+ */
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
@@ -55,19 +32,6 @@ export function saveSession(user: AuthUser, token: string) {
 
 export function clearToken() {
   localStorage.removeItem(TOKEN_KEY);
-}
-
-/** Cryptographically verify the token signature + claims (async). */
-export async function verifyToken(token: string): Promise<JWTPayload | null> {
-  try {
-    const { payload } = await jwtVerify(token, JWT_SECRET, {
-      issuer: JWT_ISSUER,
-      audience: JWT_AUDIENCE,
-    });
-    return payload;
-  } catch {
-    return null;
-  }
 }
 
 /** Decode without verifying — for displaying claims in the UI. */
@@ -146,13 +110,10 @@ export async function loginWithResult(email: string, password: string): Promise<
     }
   }
 
-  const account = ACCOUNTS[normalized];
-  if (!account || account.password !== password) return { type: 'error', message: 'Invalid email or password' };
-  const user: AuthUser = { loggedIn: true, email: normalized, name: account.name, role: account.role };
-  localStorage.setItem(KEY, JSON.stringify(user));
-  setToken(await issueToken(user));
-  window.dispatchEvent(new Event('sgpro-auth'));
-  return { type: 'success', user };
+  return {
+    type: 'error',
+    message: 'API is disabled (VITE_USE_API=false). Offline demo login has been removed for security reasons — connect a backend to sign in.',
+  };
 }
 
 export async function login(email: string, password: string): Promise<AuthUser | null> {
@@ -173,18 +134,7 @@ export async function login(email: string, password: string): Promise<AuthUser |
     }
   }
 
-  const account = ACCOUNTS[normalized];
-  if (!account || account.password !== password) return null;
-  const user: AuthUser = {
-    loggedIn: true,
-    email: normalized,
-    name: account.name,
-    role: account.role,
-  };
-  localStorage.setItem(KEY, JSON.stringify(user));
-  setToken(await issueToken(user));
-  window.dispatchEvent(new Event('sgpro-auth'));
-  return user;
+  return null;
 }
 
 export function logout() {
