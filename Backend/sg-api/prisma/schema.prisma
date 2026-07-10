@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int      @id @default(autoincrement())
+  email            String   @unique
+  passwordHash     String   @map("password_hash")
+  name             String
+  role             String
+  createdAt        DateTime @default(now()) @map("created_at")
+  twoFactorSecret  String?  @map("two_factor_secret")
+  twoFactorEnabled Boolean  @default(false) @map("two_factor_enabled")
+
+  @@map("users")
+}
+
+model EntityRecord {
+  id       Int    @id @default(autoincrement())
+  entity   String
+  recordId Int    @map("record_id")
+  data     Json
+
+  @@unique([entity, recordId])
+  @@index([entity])
+  @@map("entity_records")
+}
+
+model Activity {
+  id     Int    @id @default(autoincrement())
+  user   String
+  action String
+  time   String
+
+  @@map("activities")
+}
+
+model Message {
+  id      Int     @id @default(autoincrement())
+  sender  String
+  preview String
+  time    String
+  unread  Boolean @default(false)
+
+  @@map("messages")
+}

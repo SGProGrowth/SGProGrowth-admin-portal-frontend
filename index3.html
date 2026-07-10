@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Courses</title>
+
+<style>
+/* ===== BASE ===== */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family: "Segoe UI", sans-serif;
+    background:#f5f6fa;
+    color:#1f2937;
+}
+
+/* ===== ANIMATION ===== */
+@keyframes fadeUp{
+    from{opacity:0; transform:translateY(15px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+/* ===== LAYOUT ===== */
+.container{
+    display:flex;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar{
+    width:250px;
+    background:#071c47;
+    min-height:100vh;
+    padding:20px;
+}
+
+.sidebar h2{
+    font-size:13px;
+    margin-bottom:15px;
+    color:#ffffff;
+    font-weight:600;
+    letter-spacing:1px;
+}
+
+.sidebar a{
+    display:block;
+    padding:12px;
+    margin:8px 0;
+    text-decoration:none;
+    color:#dbeafe;
+    border-radius:12px;
+    transition:0.3s;
+}
+
+.sidebar a:hover{
+    background:#f1f5f9;
+    transform:translateX(5px);
+}
+
+.sidebar a:hover{
+    background:#0f2f75;
+}
+.instructor-btn{
+    background:white;
+    color:#2563eb !important;
+    font-weight:600;
+    box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* ===== MAIN ===== */
+.main{
+    flex:1;
+    padding:20px;
+    animation:fadeUp 0.6s ease;
+}
+
+/* HEADER */
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#fff;
+    padding:15px 20px;
+    border-radius:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+.header h1{
+    font-size:22px;
+    background:linear-gradient(90deg,#0b3a6a,#2563eb);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.header button{
+    background:#0b3a6a;
+    color:#fff;
+    border:none;
+    padding:10px 15px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.header button:hover{
+    transform:scale(1.05);
+    background:#1d4ed8;
+}
+
+/* ===== STATS ===== */
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin:20px 0;
+}
+
+.stat-box{
+    background:#fff;
+    padding:18px;
+    border-radius:10px;
+    text-align:center;
+    box-shadow:0 2px 8px rgba(0,0,0,0.04);
+    animation:fadeUp 0.6s ease;
+}
+
+.stat-box h2{
+    color:#0b3a6a;
+    font-size:24px;
+}
+
+/* ===== SEARCH ===== */
+.search{
+    display:flex;
+    gap:10px;
+    margin:15px 0;
+}
+
+.search input{
+    flex:1;
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:8px;
+}
+
+/* ===== FILTER ===== */
+.filters button{
+    padding:8px 12px;
+    border:none;
+    border-radius:6px;
+    margin-right:5px;
+    cursor:pointer;
+    background:#e5e7eb;
+    transition:0.3s;
+}
+
+.filters button.active{
+    background:#0b3a6a;
+    color:#fff;
+}
+
+/* ===== COURSE GRID ===== */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:14px;
+}
+
+/* CARD */
+.card{
+    background:#fff;
+    border-radius:10px;
+    min-width:0;
+    overflow:hidden;
+    box-shadow:0 3px 10px rgba(0,0,0,0.05);
+    transition:0.3s;
+    animation:fadeUp 0.6s ease;
+}
+
+.card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 10px 20px rgba(0,0,0,0.08);
+}
+
+/* IMAGE AREA (NO CONTENT CHANGE, ONLY STYLE) */
+.card-img{
+    height:95px;
+    overflow:hidden;
+}
+
+.card-img img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* Excel special */
+.excel{
+    background:linear-gradient(135deg,#1d6f42,#22c55e);
+}
+
+.card-body{
+    padding:15px;
+}
+
+.card-body h3{
+    font-size:16px;
+    margin-bottom:5px;
+}
+
+.small{
+    font-size:12px;
+    color:#6b7280;
+}
+
+.card-footer{
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+    font-size:12px;
+}
+
+.professor{
+    color:#6b7280;
+    font-size:11px;
+    margin:4px 0;
+}
+
+.tag{
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:20px;
+    font-size:10px;
+    margin-top:6px;
+}
+
+.green{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.actions{
+    display:flex;
+    gap:6px;
+    margin-top:10px;
+}
+
+.edit-btn{
+    flex:1;
+    background:#2563eb;
+    color:white;
+    border:none;
+    border-radius:4px;
+    padding:6px;
+}
+
+.view-btn{
+    flex:1;
+    background:#f8fafc;
+    border:1px solid #d1d5db;
+    border-radius:4px;
+    padding:6px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- SIDEBAR (UNCHANGED TEXT) -->
+<div class="sidebar">
+<h2>📚 COURSES</h2>
+<a class="active">Enrolled Courses</a>
+<a>Active Courses</a>
+<a>My Courses</a>
+<a>Notes & Reviews</a>
+<a>My Assignments</a>
+
+<h2>⚙️ INSTRUCTOR CONTROLS</h2>
+
+<a class="instructor-btn">Manage Courses</a>
+<a class="instructor-btn">Manage Units</a>
+<a class="instructor-btn">Manage Courses</a>
+<a class="instructor-btn">Manage Assignments</a>
+<a class="instructor-btn">Manage Students</a>
+<a class="instructor-btn">Quiz Questions</a>
+<a class="instructor-btn">Q&A Discussions</a>
+<a class="instructor-btn">Reports</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- HEADER (UNCHANGED TEXT) -->
+<div class="header">
+<h1>My Courses</h1>
+<button>+ Create New Course</button>
+</div>
+
+<!-- STATS (UNCHANGED) -->
+<div class="stats">
+<div class="stat-box"><h2>7</h2><p>Total Courses</p></div>
+<div class="stat-box"><h2>142</h2><p>Total Students</p></div>
+<div class="stat-box"><h2>4.8</h2><p>Avg Rating</p></div>
+<div class="stat-box"><h2>92%</h2><p>Completion Rate</p></div>
+</div>
+
+<!-- SEARCH (UNCHANGED FUNCTIONAL UI) -->
+<div class="search">
+<input type="text" placeholder="Search courses...">
+</div>
+
+<!-- FILTERS -->
+<div class="filters">
+<button class="active">All</button>
+<button>Published</button>
+<button>Pending</button>
+<button>Drafts</button>
+<select>
+<option>Recent</option>
+</select>
+</div>
+
+<!-- COURSE GRID (UNCHANGED CONTENT) -->
+<div class="grid">
+
+<!-- CARD 1 -->
+<div class="card">
+<div class="card-img">
+<img src="images/excel.jpg">
+</div>
+<div class="card-body">
+<h3>Excel Advanced Formulas & Functions</h3>
+
+<p class="professor">
+👨‍🏫 Shah Kanchi
+</p>
+
+<span class="tag green">Data Analysis</span>
+<div class="card-footer">
+<span>31 Students</span>
+<span>3 hours</span>
+<div class="actions">
+    <button class="edit-btn">Edit</button>
+    <button class="view-btn">View</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- CARD 2 -->
+<div class="card">
+<div class="card-img">
+<img src="images/powerbi.jpg">
+</div>
+<div class="card-body">
+<h3>Power BI Masterclass - DAX & More</h3>
+<p class="professor">
+👨‍🏫 Maheshmd@sharvagroup.com
+</p>
+<div class="card-footer">
+<span>👥 7 Students</span>
+<span>⏰ 7 hours</span>
+<div class="actions">
+    <button class="edit-btn">Edit</button>
+    <button class="view-btn">View</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- CARD 3 -->
+<div class="card">
+<div class="card-img">
+<img src="images/bias.jpg">
+</div>
+<div class="card-body">
+<h3>Unconscious Bias Training</h3>
+<p class="professor">
+👨‍🏫 Kanchi Shah
+</p>
+<div class="card-footer">
+<span>👥 21 Students</span>
+<span>⏰ 2 hours</span>
+<div class="actions">
+    <button class="edit-btn">Edit</button>
+    <button class="view-btn">View</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- CARD 4 -->
+<div class="card">
+<div class="card-img">
+<img src="images/colortherapy.jpg">
+</div>
+<div class="card-body">
+<h3>Color Therapy 1</h3>
+<p class="professor">
+👨‍🏫 Vartika Mehta
+</p>
+<div class="card-footer">
+<span>👥 8 Students</span>
+<span>⏰ 5 hours</span>
+<div class="actions">
+    <button class="edit-btn">Edit</button>
+    <button class="view-btn">View</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- CARD 5 -->
+<div class="card">
+<div class="card-img">
+<img src="images/project.jpg">
+</div>
+<div class="card-body">
+<h3>IT Project Management</h3>
+<p class="professor">
+👨‍🏫 Maheshmd@sharvagroup.com
+</p>
+<div class="card-footer">
+<span>👥 3 Students</span>
+<span>⏰ 4 hours</span>
+<div class="actions">
+    <button class="edit-btn">Edit</button>
+    <button class="view-btn">View</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- CARD 6 -->
+<div class="card">
+<div class="card-img">
+<img src="images/bni.jpg">
+</div>
+<div class="card-body">
+<h3>BNI Trainers Power Team</h3>
+<p class="professor">
+👨‍🏫 Maheshmd@sharvagroup.com
+</p>
+<div class="card-footer">
+<span>👥 10 Students</span>
+<span>⏰ 6 hours</span>
+<div class="actions">
+    <button class="edit-btn">Edit</button>
+    <button class="view-btn">View</button>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</body>
+</html>

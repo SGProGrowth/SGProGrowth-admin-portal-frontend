@@ -1,0 +1,672 @@
+{
+  "entities": {
+    "courses": [
+      {
+        "title": "Power BI Masterclass – DAX, Excel And More",
+        "instructor": "Mahesh MD",
+        "category": "Imported",
+        "status": "publish",
+        "students": 0,
+        "duration": "0 hrs",
+        "completion": 0,
+        "rating": 0,
+        "reviews": 0,
+        "price": 0,
+        "image": "",
+        "wpId": 563,
+        "excerpt": "Understanding DAX table calculations, Power BI Desktop and Excel. How to master DAX in Power BI. How to learn DAX fast",
+        "id": 831
+      },
+      {
+        "id": 801,
+        "title": "Microsoft Excel Advanced Excel Formulas & Functions",
+        "instructor": "Shah Kanchi",
+        "category": "Data Analysis",
+        "status": "published",
+        "students": 57,
+        "duration": "57 hrs",
+        "completion": 100,
+        "rating": 5,
+        "reviews": 2,
+        "price": 0,
+        "image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=460&h=300&fit=crop"
+      },
+      {
+        "id": 802,
+        "title": "Power BI Masterclass - DAX, Excel And More",
+        "instructor": "Mahesh MD",
+        "category": "Office Productivity",
+        "status": "published",
+        "students": 2,
+        "duration": "2 hrs",
+        "completion": 0,
+        "rating": 0,
+        "reviews": 0,
+        "price": 0,
+        "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=460&h=300&fit=crop"
+      },
+      {
+        "id": 803,
+        "title": "Unconscious bias training",
+        "instructor": "Kanchi Shah",
+        "category": "Unconscious Bias",
+        "status": "published",
+        "students": 21,
+        "duration": "21 hrs",
+        "completion": 0,
+        "rating": 0,
+        "reviews": 0,
+        "price": 0,
+        "image": "https://images.unsplash.com/photo-1573497161161-c3e73707e25c?w=460&h=300&fit=crop"
+      },
+      {
+        "id": 804,
+        "title": "Color therapy 1",
+        "instructor": "Vartika Mehta",
+        "category": "Color Therapy",
+        "status": "published",
+        "students": 0,
+        "duration": "0 hrs",
+        "completion": 100,
+        "rating": 0,
+        "reviews": 0,
+        "price": 0,
+        "image": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=460&h=300&fit=crop"
+      },
+      {
+        "id": 805,
+        "title": "Demo Course",
+        "instructor": "Kanchi Shah",
+        "category": "Demo",
+        "status": "draft",
+        "students": 0,
+        "duration": "0 hrs",
+        "completion": 0,
+        "rating": 0,
+        "reviews": 0,
+        "price": 0,
+        "image": "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=460&h=300&fit=crop"
+      },
+      {
+        "id": 822,
+        "title": "IT Project Management",
+        "instructor": "Mahesh MD",
+        "category": "Project Management",
+        "status": "published",
+        "students": 3,
+        "duration": "3 hrs",
+        "completion": 15,
+        "rating": 0,
+        "reviews": 0,
+        "price": 108,
+        "image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=460&h=300&fit=crop&crop=right"
+      },
+      {
+        "id": 830,
+        "title": "BNI-Trainers and Coaches Power team",
+        "instructor": "Mahesh MD",
+        "category": "Business Networking",
+        "status": "pending",
+        "students": 4,
+        "duration": "4 hrs",
+        "completion": 50,
+        "rating": 0,
+        "reviews": 0,
+        "price": 0,
+        "image": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=460&h=300&fit=crop"
+      }
+    ],
+    "quizzes": [
+      {
+        "title": "AI Quiz",
+        "course": "General",
+        "questions": 0,
+        "attempts": 0,
+        "avgScore": 0,
+        "passmark": 60,
+        "status": "publish",
+        "wpId": 130,
+        "id": 14
+      },
+      {
+        "title": "WPLMS 4.0 Quiz",
+        "course": "General",
+        "questions": 0,
+        "attempts": 0,
+        "avgScore": 0,
+        "passmark": 60,
+        "status": "publish",
+        "wpId": 129,
+        "id": 13
+      },
+      {
+        "title": "Basic Quiz",
+        "course": "General",
+        "questions": 0,
+        "attempts": 0,
+        "avgScore": 0,
+        "passmark": 60,
+        "status": "publish",
+        "wpId": 128,
+        "id": 12
+      },
+      {
+        "title": "Basic",
+        "course": "General",
+        "questions": 0,
+        "attempts": 0,
+        "avgScore": 0,
+        "passmark": 60,
+        "status": "publish",
+        "wpId": 127,
+        "id": 11
+      },
+      {
+        "title": "Question Set",
+        "course": "General",
+        "questions": 0,
+        "attempts": 0,
+        "avgScore": 0,
+        "passmark": 60,
+        "status": "publish",
+        "wpId": 126,
+        "id": 10
+      },
+      {
+        "title": "Dynamic quiz",
+        "course": "General",
+        "questions": 0,
+        "attempts": 0,
+        "avgScore": 0,
+        "passmark": 60,
+        "status": "publish",
+        "wpId": 125,
+        "id": 9
+      },
+      {
+        "title": "Dynamic quiz",
+        "course": "General",
+        "questions": 0,
+        "attempts": 0,
+        "avgScore": 0,
+        "passmark": 60,
+        "status": "publish",
+        "wpId": 124,
+        "id": 8
+      },
+      {
+        "title": "Final quiz",
+        "course": "General",
+        "questions": 0,
+        "attempts": 0,
+        "avgScore": 0,
+        "passmark": 60,
+        "status": "publish",
+        "wpId": 123,
+        "id": 7
+      },
+      {
+        "title": "The AI Quiz",
+        "course": "General",
+        "questions": 0,
+        "attempts": 0,
+        "avgScore": 0,
+        "passmark": 60,
+        "status": "publish",
+        "wpId": 122,
+        "id": 6
+      },
+      {
+        "title": "Multiple Choice quiz",
+        "course": "General",
+        "questions": 0,
+        "attempts": 0,
+        "avgScore": 0,
+        "passmark": 60,
+        "status": "publish",
+        "wpId": 121,
+        "id": 5
+      },
+      {
+        "title": "Live Quiz test",
+        "course": "General",
+        "questions": 0,
+        "attempts": 0,
+        "avgScore": 0,
+        "passmark": 60,
+        "status": "publish",
+        "wpId": 887,
+        "id": 4
+      },
+      {
+        "title": "Radar chart Quiz",
+        "course": "General",
+        "questions": 0,
+        "attempts": 0,
+        "avgScore": 0,
+        "passmark": 60,
+        "status": "publish",
+        "wpId": 1119,
+        "id": 3
+      },
+      {
+        "id": 1,
+        "title": "PM Fundamentals Quiz",
+        "course": "IT Project Management",
+        "questions": 15,
+        "attempts": 42,
+        "avgScore": 78,
+        "passmark": 60
+      },
+      {
+        "id": 2,
+        "title": "Excel Formulas Assessment",
+        "course": "Microsoft Excel Advanced Excel Formulas & Functions",
+        "questions": 20,
+        "attempts": 31,
+        "avgScore": 85,
+        "passmark": 70
+      }
+    ],
+    "questions": [
+      {
+        "id": 1,
+        "text": "What is the critical path in project management?",
+        "quiz": "PM Fundamentals Quiz",
+        "type": "MCQ",
+        "points": 5
+      },
+      {
+        "id": 2,
+        "text": "Explain the difference between VLOOKUP and XLOOKUP.",
+        "quiz": "Excel Formulas Assessment",
+        "type": "Essay",
+        "points": 10
+      }
+    ],
+    "assignments": [
+      {
+        "id": 1,
+        "title": "Create a Project Charter",
+        "course": "IT Project Management",
+        "due": "2026-03-15",
+        "submissions": 12,
+        "status": "active"
+      },
+      {
+        "id": 2,
+        "title": "Build a Dashboard",
+        "course": "Microsoft Excel Advanced Excel Formulas & Functions",
+        "due": "2026-03-20",
+        "submissions": 28,
+        "status": "active"
+      }
+    ],
+    "students": [
+      {
+        "name": "Bhasha World",
+        "email": "",
+        "courses": 0,
+        "progress": 0,
+        "joined": "2026-07-10",
+        "avatar": "https://demos.wplms.io/wp-content/themes/wplms/assets/images/avatar.jpg",
+        "wpId": 20,
+        "profileUrl": "https://sharvaconsulting.com/members-directory/bhasha-world/",
+        "id": 13
+      },
+      {
+        "name": "Jatan Atara",
+        "email": "",
+        "courses": 0,
+        "progress": 0,
+        "joined": "2026-07-10",
+        "avatar": "https://demos.wplms.io/wp-content/themes/wplms/assets/images/avatar.jpg",
+        "wpId": 21,
+        "profileUrl": "https://sharvaconsulting.com/members-directory/jatan-atara/",
+        "id": 12
+      },
+      {
+        "name": "Himannshu Jain",
+        "email": "",
+        "courses": 0,
+        "progress": 0,
+        "joined": "2026-07-10",
+        "avatar": "https://demos.wplms.io/wp-content/themes/wplms/assets/images/avatar.jpg",
+        "wpId": 22,
+        "profileUrl": "https://sharvaconsulting.com/members-directory/himannshu-jain/",
+        "id": 11
+      },
+      {
+        "name": "Sonie Thakkar",
+        "email": "",
+        "courses": 0,
+        "progress": 0,
+        "joined": "2026-07-10",
+        "avatar": "https://demos.wplms.io/wp-content/themes/wplms/assets/images/avatar.jpg",
+        "wpId": 23,
+        "profileUrl": "https://sharvaconsulting.com/members-directory/sonie-thakkar/",
+        "id": 10
+      },
+      {
+        "name": "Vijay",
+        "email": "",
+        "courses": 0,
+        "progress": 0,
+        "joined": "2026-07-10",
+        "avatar": "https://demos.wplms.io/wp-content/themes/wplms/assets/images/avatar.jpg",
+        "wpId": 24,
+        "profileUrl": "https://sharvaconsulting.com/members-directory/vijay/",
+        "id": 9
+      },
+      {
+        "name": "mayuri powar",
+        "email": "",
+        "courses": 0,
+        "progress": 0,
+        "joined": "2026-07-10",
+        "avatar": "https://demos.wplms.io/wp-content/themes/wplms/assets/images/avatar.jpg",
+        "wpId": 25,
+        "profileUrl": "https://sharvaconsulting.com/members-directory/mayuripowar/",
+        "id": 8
+      },
+      {
+        "name": "NormanZewZE",
+        "email": "",
+        "courses": 0,
+        "progress": 0,
+        "joined": "2026-07-10",
+        "avatar": "https://demos.wplms.io/wp-content/themes/wplms/assets/images/avatar.jpg",
+        "wpId": 26,
+        "profileUrl": "https://sharvaconsulting.com/members-directory/normanzew/",
+        "id": 7
+      },
+      {
+        "name": "LavilljeaniHE",
+        "email": "",
+        "courses": 0,
+        "progress": 0,
+        "joined": "2026-07-10",
+        "avatar": "https://demos.wplms.io/wp-content/themes/wplms/assets/images/avatar.jpg",
+        "wpId": 28,
+        "profileUrl": "https://sharvaconsulting.com/members-directory/lavilljeani/",
+        "id": 6
+      },
+      {
+        "name": "shweta yadav",
+        "email": "",
+        "courses": 0,
+        "progress": 0,
+        "joined": "2026-07-10",
+        "avatar": "https://demos.wplms.io/wp-content/themes/wplms/assets/images/avatar.jpg",
+        "wpId": 351,
+        "profileUrl": "https://sharvaconsulting.com/members-directory/shweta/",
+        "id": 5
+      },
+      {
+        "id": 1,
+        "name": "Neha Sharma",
+        "email": "neha.s@email.com",
+        "courses": 3,
+        "progress": 68,
+        "joined": "2025-08-12"
+      },
+      {
+        "id": 2,
+        "name": "Riya Patel",
+        "email": "riya.p@email.com",
+        "courses": 2,
+        "progress": 45,
+        "joined": "2025-09-03"
+      },
+      {
+        "id": 3,
+        "name": "Ankit Verma",
+        "email": "ankit.v@email.com",
+        "courses": 1,
+        "progress": 90,
+        "joined": "2025-10-21"
+      },
+      {
+        "id": 4,
+        "name": "Kanchi S",
+        "email": "kanchiss23@gmail.com",
+        "courses": 2,
+        "progress": 55,
+        "joined": "2025-11-05"
+      }
+    ],
+    "instructors": [
+      {
+        "name": "AshishInstructor",
+        "email": "",
+        "role": "Instructor",
+        "courses": 0,
+        "students": 0,
+        "commission": 70,
+        "avatar": "https://demos.wplms.io/wp-content/themes/wplms/assets/images/avatar.jpg",
+        "wpId": 8,
+        "profileUrl": "https://sharvaconsulting.com/members-directory/fajafi2015cotasen-com/",
+        "id": 7
+      },
+      {
+        "name": "TATA",
+        "email": "",
+        "role": "Instructor",
+        "courses": 0,
+        "students": 0,
+        "commission": 70,
+        "avatar": "https://demos.wplms.io/wp-content/themes/wplms/assets/images/avatar.jpg",
+        "wpId": 10,
+        "profileUrl": "https://sharvaconsulting.com/members-directory/tivofa3546jobzyy-com/",
+        "id": 6
+      },
+      {
+        "name": "Ninad Subhashchandra Kulkarni",
+        "email": "",
+        "role": "Instructor",
+        "courses": 0,
+        "students": 0,
+        "commission": 70,
+        "avatar": "https://demos.wplms.io/wp-content/themes/wplms/assets/images/avatar.jpg",
+        "wpId": 12,
+        "profileUrl": "https://sharvaconsulting.com/members-directory/ninadkulkarni1966gmail-com/",
+        "id": 5
+      },
+      {
+        "name": "Kanchi shah",
+        "email": "",
+        "role": "Instructor",
+        "courses": 0,
+        "students": 0,
+        "commission": 70,
+        "avatar": "https://demos.wplms.io/wp-content/themes/wplms/assets/images/avatar.jpg",
+        "wpId": 13,
+        "profileUrl": "https://sharvaconsulting.com/members-directory/ut35480gmail-com/",
+        "id": 4
+      },
+      {
+        "id": 1,
+        "name": "Mahesh MD",
+        "email": "maheshmd@sharvagroup.com",
+        "role": "Admin",
+        "courses": 3,
+        "students": 9,
+        "commission": 70
+      },
+      {
+        "id": 2,
+        "name": "Shah Kanchi",
+        "email": "shah.k@sharvagroup.com",
+        "role": "Instructor",
+        "courses": 1,
+        "students": 57,
+        "commission": 65
+      },
+      {
+        "id": 3,
+        "name": "Vartika Mehta",
+        "email": "vartika@sharvagroup.com",
+        "role": "Instructor",
+        "courses": 1,
+        "students": 0,
+        "commission": 60
+      }
+    ],
+    "groups": [
+      {
+        "name": "Excel Group 1",
+        "members": 0,
+        "privacy": "Public",
+        "description": "Group 1 for excel course",
+        "wpId": 1,
+        "id": 6
+      },
+      {
+        "name": "Batch 1 – Excel group",
+        "members": 0,
+        "privacy": "Public",
+        "description": "1st batch for excel group",
+        "wpId": 2,
+        "id": 5
+      },
+      {
+        "name": "Unconscious bias – Weekday Batch",
+        "members": 0,
+        "privacy": "Public",
+        "description": "Weekday Batch - Monday to Friday",
+        "wpId": 3,
+        "id": 4
+      },
+      {
+        "name": "Uconscious bias – Weekend Batch",
+        "members": 0,
+        "privacy": "Public",
+        "description": "Saturday Sunday batch",
+        "wpId": 4,
+        "id": 3
+      },
+      {
+        "id": 1,
+        "name": "BNI Power Team",
+        "members": 4,
+        "privacy": "Private"
+      },
+      {
+        "id": 2,
+        "name": "Excel Learners",
+        "members": 31,
+        "privacy": "Public"
+      }
+    ],
+    "discussions": [
+      {
+        "id": 1,
+        "topic": "Best tools for Gantt charts?",
+        "course": "IT Project Management",
+        "author": "Neha Sharma",
+        "replies": 4,
+        "date": "2026-02-28"
+      },
+      {
+        "id": 2,
+        "topic": "Pivot table refresh issue",
+        "course": "Microsoft Excel Advanced Excel Formulas & Functions",
+        "author": "Riya Patel",
+        "replies": 2,
+        "date": "2026-03-01"
+      }
+    ],
+    "certificates": [
+      {
+        "id": 1,
+        "name": "Excel Mastery Certificate",
+        "course": "Microsoft Excel Advanced Excel Formulas & Functions",
+        "issued": 2,
+        "orientation": "Landscape"
+      },
+      {
+        "id": 2,
+        "name": "PM Completion Certificate",
+        "course": "IT Project Management",
+        "issued": 0,
+        "orientation": "Landscape"
+      }
+    ],
+    "events": [
+      {
+        "id": 1,
+        "title": "Weekly Coaching Session",
+        "host": "Mahesh MD",
+        "date": "2026-03-05 10:00 AM",
+        "type": "Coaching"
+      },
+      {
+        "id": 2,
+        "title": "Excel Q&A Live",
+        "host": "Shah Kanchi",
+        "date": "2026-03-08 03:00 PM",
+        "type": "Webinar"
+      }
+    ]
+  },
+  "activities": [
+    {
+      "user": "Neha Sharma",
+      "action": "completed Unit 2 in IT Project Management",
+      "time": "2 hours ago"
+    },
+    {
+      "user": "Riya Patel",
+      "action": "submitted assignment in Excel Advanced",
+      "time": "5 hours ago"
+    },
+    {
+      "user": "Ankit Verma",
+      "action": "enrolled in Power BI Masterclass",
+      "time": "1 day ago"
+    },
+    {
+      "user": "Shah Kanchi",
+      "action": "published a new quiz in Excel Advanced",
+      "time": "1 day ago"
+    },
+    {
+      "user": "Kanchi S",
+      "action": "posted a question in Q&A Discussions",
+      "time": "2 days ago"
+    }
+  ],
+  "messages": [
+    {
+      "from": "Kanchi Shah",
+      "preview": "Great progress on your assignment!",
+      "time": "10:30 AM",
+      "unread": true,
+      "id": 1
+    },
+    {
+      "from": "Course Support",
+      "preview": "Your quiz results are ready",
+      "time": "Yesterday",
+      "unread": true,
+      "id": 2
+    },
+    {
+      "from": "Neha Sharma",
+      "preview": "Thank you for the feedback",
+      "time": "2 days ago",
+      "unread": false,
+      "id": 3
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "email": "maheshmd@sharvagroup.com",
+      "name": "Mahesh MD",
+      "role": "admin",
+      "passwordHash": "$2b$10$rv1Ph/vkF2CUqmtPv1b7eeTPVfZdWNPCnSIVUJrNrFVxb3Ko.mPXO"
+    }
+  ],
+  "nextUserId": 2
+}

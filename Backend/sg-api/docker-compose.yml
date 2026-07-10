@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sgpro-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sgpro
+      POSTGRES_PASSWORD: sgpro
+      POSTGRES_DB: sgpro
+    ports:
+      - "5432:5432"
+    volumes:
+      - sgpro_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sgpro -d sgpro"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  sgpro_pgdata:

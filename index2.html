@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+
+    if(username==="admin" && password==="admin123")
+{
+    localStorage.setItem("loggedIn","true");
+    window.location.href="index2.html";
+}
+
+if(localStorage.getItem("loggedIn")!=="true")
+{
+    window.location.href="login.html";
+}
+
+function logout()
+{
+    localStorage.removeItem("loggedIn");
+    window.location.href="login.html";
+}
+</script>
+<script>
+function logout()
+{
+    window.location.href="login.html";
+}
+</script>
+
+<script>
+
+function showSection(sectionId)
+{
+    document.querySelectorAll('.section')
+    .forEach(sec => sec.style.display = 'none');
+
+    document.getElementById(sectionId).style.display = 'block';
+}
+
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Management Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #1a3c6e;
+            --primary-btn: #1d4ed8;
+            --sidebar-bg: #ffffff;
+            --sidebar-active: #1a3c6e;
+            --body-bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --border: #e5e7eb;
+            --text: #111827;
+            --muted: #6b7280;
+            --label-green: #d1fae5;
+            --label-green-text: #065f46;
+            --label-purple: #ede9fe;
+            --label-purple-text: #5b21b6;
+            --label-blue: #dbeafe;
+            --label-blue-text: #1e40af;
+            --label-pink: #fce7f3;
+            --label-pink-text: #9d174d;
+            --label-orange: #ffedd5;
+            --label-orange-text: #9a3412;
+            --label-teal: #ccfbf1;
+            --label-teal-text: #0f766e;
+            --radius: 10px;
+        }
+
+    
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--body-bg);
+            color: var(--text);
+        }
+
+        /* ── LAYOUT ── */
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 210px;
+            min-width: 210px;
+            background: #0f1b35;
+            border-right: none;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 22px 18px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-logo .logo-icon {
+            width: 34px; height: 34px;
+            background: #2563eb;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-logo span {
+            font-size: 15px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-section {
+            padding: 18px 12px 6px;
+        }
+
+        .sidebar-section-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.35);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 8px;
+            margin-bottom: 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            margin-bottom: 2px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.07);
+            color: #ffffff;
+        }
+
+        .nav-item.active {
+            background: #2563eb;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+        /* ── MAIN ── */
+        .main {
+            margin-left: 210px;
+            flex: 1;
+            padding: 28px 32px;
+            min-width: 0;
+        }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .page-header h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .btn-create {
+            background: var(--primary-btn);
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            transition: background 0.15s, transform 0.1s;
+        }
+
+        .btn-create:hover { background: #1e3fa8; transform: translateY(-1px); }
+
+        /* ── STATS ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        .stat-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.courses { background: #ede9fe; }
+        .stat-icon.students { background: #dbeafe; }
+        .stat-icon.rating { background: #fef9c3; }
+        .stat-icon.completion { background: #dcfce7; }
+
+        .stat-info {}
+        .stat-value {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 3px;
+            font-weight: 500;
+        }
+
+        /* ── SEARCH + FILTER BAR ── */
+        .search-bar {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        .search-input-wrap {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input-wrap input {
+            width: 100%;
+            padding: 9px 14px 9px 38px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            font-size: 13px;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.15s;
+            font-family: inherit;
+        }
+
+        .search-input-wrap input:focus { border-color: var(--primary-btn); }
+
+        .search-input-wrap .search-ico {
+            position: absolute;
+            left: 12px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            pointer-events: none;
+        }
+
+        .filter-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .filter-btn {
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--muted);
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+
+        .filter-btn.active {
+            background: var(--primary-btn);
+            color: white;
+            border-color: var(--primary-btn);
+        }
+
+        .filter-btn:hover:not(.active) { border-color: var(--primary-btn); color: var(--primary-btn); }
+
+        .sort-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            background: white;
+            cursor: pointer;
+            outline: none;
+            font-family: inherit;
+        }
+
+        /* ── TABS ── */
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 18px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+            cursor: pointer;
+            transition: color 0.15s, border-color 0.15s;
+            font-family: inherit;
+        }
+
+        .tab-btn.active { color: var(--primary-btn); border-bottom-color: var(--primary-btn); }
+        .tab-btn:hover:not(.active) { color: var(--text); }
+
+        /* ── COURSE GRID ── */
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        /* ── COURSE CARD ── */
+        .course-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .card-thumb {
+            height: 148px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-thumb img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .card-body {
+            padding: 14px 16px 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .card-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            font-family: Georgia, 'Times New Roman', serif;
+            color: var(--text);
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .card-instructor {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 10px;
+        }
+
+        .avatar-circle {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .card-instructor span {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 14px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+            margin-bottom: 14px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11.5px;
+            color: var(--muted);
+        }
+
+        .meta-item svg { width: 13px; height: 13px; }
+
+        .meta-item.rating { color: #f59e0b; }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+        }
+
+        .btn-edit, .btn-view {
+            flex: 1;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-edit {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-edit:hover { background: #142f57; }
+
+        .btn-view {
+            background: white;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-view:hover { border-color: var(--primary); color: var(--primary); }
+    </style>
+</head>
+<body>
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">📚</div>
+            <span>Courses</span>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Student</div>
+
+            <a class="nav-item" href="enrolled-courses.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                Enrolled Courses
+            </a>
+            <a class="nav-item" href="active-courses">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Active Courses
+            </a>
+            <a class="nav-item" href="my-courses">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+                My Courses
+            </a>
+            <a class="nav-item" href="notes">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+                Notes &amp; Reviews
+            </a>
+            <a class="nav-item" href="my-assignments">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+                My Assignments
+            </a>
+            <a class="nav-item"
+   onclick="showSection('courses-section')">
+   Manage Courses
+</a> 
+            <a class="nav-item"
+   onclick="showSection('students-section')">
+   Students
+</a>
+        </div>
+    
+        <div id="courses-section">
+   ...
+        </div>
+
+        <div id="units-section" style="display:none;">
+   ...
+        </div>
+
+        <div id="students-section" style="display:none;">
+   ...
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Instructor Controls</div>
+
+            <a class="nav-item" href="manage-courses">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                Manage Courses
+            </a>
+            <a class="nav-item" href="manage-units">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                Manage Units
+            </a>
+            <a class="nav-item" href="manage-courses">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                Manage Courses
+            </a>
+            <a class="nav-item" href="manage-assignments">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Manage Assignments
+            </a>
+            <a class="nav-item" href="manage-students">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                Manage Students
+            </a>
+            <a class="nav-item" href="quiz-questions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Quiz Questions
+            </a>
+            <a class="nav-item" href="q&amp">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                Q&amp;A Discussions
+            </a>
+            <a class="nav-item" href="a-discussions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                Q&amp;A Discussions
+            </a>
+            <a class="nav-item" href="reports">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Reports
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+            <h1>My Courses</h1>
+            <button class="btn-create">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Create New Course
+            </button>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon courses">📖</div>
+                <div class="stat-info">
+                    <div class="stat-value">7</div>
+                    <div class="stat-label">Total Courses</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon students">👥</div>
+                <div class="stat-info">
+                    <div class="stat-value">142</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon rating">⭐</div>
+                <div class="stat-info">
+                    <div class="stat-value">4.8</div>
+                    <div class="stat-label">Avg Rating</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon completion">🔄</div>
+                <div class="stat-info">
+                    <div class="stat-value">92%</div>
+                    <div class="stat-label">Completion Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEARCH + FILTERS -->
+        <div class="search-bar">
+            <div class="search-input-wrap">
+                <svg class="search-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" placeholder="Search courses...">
+            </div>
+            <div class="filter-btns">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">Published</button>
+                <button class="filter-btn">Pending</button>
+                <button class="filter-btn">Drafts</button>
+                <button class="filter-btn">Recent</button>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-btn active">Published (7)</button>
+            <button class="tab-btn">Pending (0)</button>
+            <button class="tab-btn">Drafts (0)</button>
+        </div>
+
+        <!-- COURSE GRID -->
+        <div class="course-grid">
+
+            <!-- Card 1 -->
+            <div class="course-card">
+                <div class="card-thumb">
+                    <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&h=200&fit=crop" alt="Excel Advanced">
+                </div>
+                <div class="card-body">
+                    <div class="card-title">Excel Advanced Formulas &amp; Functions</div>
+                    <div class="card-instructor">
+                        <div class="avatar-circle" style="background:#4f46e5;">MH</div>
+                        <span>Maheshmd</span>
+                    </div>
+                    <span class="badge" style="background:var(--label-green);color:var(--label-green-text);">Data Analysis</span>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                            31 Students
+                        </div>
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            3 hours
+                        </div>
+                        <div class="meta-item rating">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            5 (2)
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-edit">Edit</button>
+                        <button class="btn-view">View</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="course-card">
+                <div class="card-thumb">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=200&fit=crop" alt="Power BI">
+                </div>
+                <div class="card-body">
+                    <div class="card-title">Power BI Masterclass - DAX, Excel And More</div>
+                    <div class="card-instructor">
+                        <div class="avatar-circle" style="background:#0891b2;">MH</div>
+                        <span>Maheshmd</span>
+                    </div>
+                    <span class="badge" style="background:var(--label-purple);color:var(--label-purple-text);">Office Productivity</span>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                            7 Students
+                        </div>
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            7 hours
+                        </div>
+                        <div class="meta-item rating">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            0 (0)
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-edit">Edit</button>
+                        <button class="btn-view">View</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="course-card">
+                <div class="card-thumb">
+                    <img src="https://images.unsplash.com/photo-1573497161161-c3e73707e25c?w=400&h=200&fit=crop" alt="Unconscious Bias">
+                </div>
+                <div class="card-body">
+                    <div class="card-title">Unconscious Bias Training</div>
+                    <div class="card-instructor">
+                        <div class="avatar-circle" style="background:#059669;">KS</div>
+                        <span>Kanchi Shah</span>
+                    </div>
+                    <span class="badge" style="background:var(--label-blue);color:var(--label-blue-text);">Unconscious Bias</span>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                            21 Students
+                        </div>
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            2 hours
+                        </div>
+                        <div class="meta-item rating">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            0 (0)
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button onclick="logout()">Logout</button>
+                        <button class="btn-edit">Edit</button>
+                        <button class="btn-view">View</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="course-card">
+                <div class="card-thumb">
+                    <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=200&fit=crop" alt="Color Therapy">
+                </div>
+                <div class="card-body">
+                    <div class="card-title">Color Therapy 1</div>
+                    <div class="card-instructor">
+                        <div class="avatar-circle" style="background:#d97706;">VM</div>
+                        <span>Vartika Mehta</span>
+                    </div>
+                    <span class="badge" style="background:var(--label-pink);color:var(--label-pink-text);">Color Therapy 1</span>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                            0 Students
+                        </div>
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            0 hours
+                        </div>
+                        <div class="meta-item rating">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            0 (0)
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-edit">Edit</button>
+                        <button class="btn-view">View</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="course-card">
+                <div class="card-thumb">
+                    <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=400&h=200&fit=crop" alt="Demo Course">
+                </div>
+                <div class="card-body">
+                    <div class="card-title">Demo Course</div>
+                    <div class="card-instructor">
+                        <div class="avatar-circle" style="background:#059669;">KS</div>
+                        <span>Kanchi Shah</span>
+                    </div>
+                    <span class="badge" style="background:var(--label-teal);color:var(--label-teal-text);">Demo</span>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                            0 Students
+                        </div>
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            0 hours
+                        </div>
+                        <div class="meta-item rating">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            0 (0)
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-edit">Edit</button>
+                        <button class="btn-view">View</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="course-card">
+                <div class="card-thumb">
+                    <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&h=200&fit=crop&crop=right" alt="IT Project Management">
+                </div>
+                <div class="card-body">
+                    <div class="card-title">IT Project Management</div>
+                    <div class="card-instructor">
+                        <div class="avatar-circle" style="background:#0891b2;">MH</div>
+                        <span>Maheshmd</span>
+                    </div>
+                    <span class="badge" style="background:var(--label-orange);color:var(--label-orange-text);">Project Management</span>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                            3 Students
+                        </div>
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            4 hours
+                        </div>
+                        <div class="meta-item rating">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            0 (0)
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-edit">Edit</button>
+                        <button class="btn-view">View</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 7 -->
+            <div class="course-card">
+                <div class="card-thumb">
+                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=200&fit=crop" alt="BNI Trainers">
+                </div>
+                <div class="card-body">
+                    <div class="card-title">BNI-Trainers and Coaches Power Team</div>
+                    <div class="card-instructor">
+                        <div class="avatar-circle" style="background:#0891b2;">MH</div>
+                        <span>Maheshmd</span>
+                    </div>
+                    <span class="badge" style="background:var(--label-green);color:var(--label-green-text);">Business Networking</span>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                            10 Students
+                        </div>
+                        <div class="meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            6 hours
+                        </div>
+                        <div class="meta-item rating">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            0 (0)
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-edit">Edit</button>
+                        <button class="btn-view">View</button>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /course-grid -->
+    </main>
+</div>
+
+<script>
+    // Filter buttons toggle
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Tabs toggle
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Nav items toggle
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+</script>
+</body>
+</html>

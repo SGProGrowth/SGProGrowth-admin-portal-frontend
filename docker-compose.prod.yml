@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sgpro
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sgpro}
+      POSTGRES_DB: sgpro
+    volumes:
+      - sgpro_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U sgpro -d sgpro']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./Backend/sg-api
+      target: production
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://sgpro:${POSTGRES_PASSWORD:-sgpro}@postgres:5432/sgpro
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      JWT_ISSUER: sgprogrowth-admin
+      JWT_AUDIENCE: sgprogrowth-portal
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+      WP_BASE_URL: https://sharvaconsulting.com
+    volumes:
+      - sgpro_uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./Frontend/sg-admin
+      args:
+        VITE_API_URL: /api
+        VITE_USE_API: 'true'
+        VITE_JWT_SECRET: ${JWT_SECRET}
+    restart: unless-stopped
+    ports:
+      - '${HTTP_PORT:-80}:80'
+    depends_on:
+      - api
+
+volumes:
+  sgpro_pgdata:
+  sgpro_uploads:

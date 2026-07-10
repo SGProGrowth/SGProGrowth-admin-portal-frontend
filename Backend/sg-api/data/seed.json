@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "courses": [
+      { "id": 801, "title": "Microsoft Excel Advanced Excel Formulas & Functions", "instructor": "Shah Kanchi", "category": "Data Analysis", "status": "published", "students": 57, "duration": "57 hrs", "completion": 100, "rating": 5, "reviews": 2, "price": 0, "image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=460&h=300&fit=crop" },
+      { "id": 802, "title": "Power BI Masterclass - DAX, Excel And More", "instructor": "Mahesh MD", "category": "Office Productivity", "status": "published", "students": 2, "duration": "2 hrs", "completion": 0, "rating": 0, "reviews": 0, "price": 0, "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=460&h=300&fit=crop" },
+      { "id": 803, "title": "Unconscious bias training", "instructor": "Kanchi Shah", "category": "Unconscious Bias", "status": "published", "students": 21, "duration": "21 hrs", "completion": 0, "rating": 0, "reviews": 0, "price": 0, "image": "https://images.unsplash.com/photo-1573497161161-c3e73707e25c?w=460&h=300&fit=crop" },
+      { "id": 804, "title": "Color therapy 1", "instructor": "Vartika Mehta", "category": "Color Therapy", "status": "published", "students": 0, "duration": "0 hrs", "completion": 100, "rating": 0, "reviews": 0, "price": 0, "image": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=460&h=300&fit=crop" },
+      { "id": 805, "title": "Demo Course", "instructor": "Kanchi Shah", "category": "Demo", "status": "draft", "students": 0, "duration": "0 hrs", "completion": 0, "rating": 0, "reviews": 0, "price": 0, "image": "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=460&h=300&fit=crop" },
+      { "id": 822, "title": "IT Project Management", "instructor": "Mahesh MD", "category": "Project Management", "status": "published", "students": 3, "duration": "3 hrs", "completion": 15, "rating": 0, "reviews": 0, "price": 108, "image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=460&h=300&fit=crop&crop=right" },
+      { "id": 830, "title": "BNI-Trainers and Coaches Power team", "instructor": "Mahesh MD", "category": "Business Networking", "status": "pending", "students": 4, "duration": "4 hrs", "completion": 50, "rating": 0, "reviews": 0, "price": 0, "image": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=460&h=300&fit=crop" }
+    ],
+    "quizzes": [
+      { "id": 1, "title": "PM Fundamentals Quiz", "course": "IT Project Management", "questions": 15, "attempts": 42, "avgScore": 78, "passmark": 60 },
+      { "id": 2, "title": "Excel Formulas Assessment", "course": "Microsoft Excel Advanced Excel Formulas & Functions", "questions": 20, "attempts": 31, "avgScore": 85, "passmark": 70 }
+    ],
+    "questions": [
+      { "id": 1, "text": "What is the critical path in project management?", "quiz": "PM Fundamentals Quiz", "type": "MCQ", "points": 5 },
+      { "id": 2, "text": "Explain the difference between VLOOKUP and XLOOKUP.", "quiz": "Excel Formulas Assessment", "type": "Essay", "points": 10 }
+    ],
+    "assignments": [
+      { "id": 1, "title": "Create a Project Charter", "course": "IT Project Management", "due": "2026-03-15", "submissions": 12, "status": "active" },
+      { "id": 2, "title": "Build a Dashboard", "course": "Microsoft Excel Advanced Excel Formulas & Functions", "due": "2026-03-20", "submissions": 28, "status": "active" }
+    ],
+    "students": [
+      { "id": 1, "name": "Neha Sharma", "email": "neha.s@email.com", "courses": 3, "progress": 68, "joined": "2025-08-12" },
+      { "id": 2, "name": "Riya Patel", "email": "riya.p@email.com", "courses": 2, "progress": 45, "joined": "2025-09-03" },
+      { "id": 3, "name": "Ankit Verma", "email": "ankit.v@email.com", "courses": 1, "progress": 90, "joined": "2025-10-21" },
+      { "id": 4, "name": "Kanchi S", "email": "kanchiss23@gmail.com", "courses": 2, "progress": 55, "joined": "2025-11-05" }
+    ],
+    "instructors": [
+      { "id": 1, "name": "Mahesh MD", "email": "maheshmd@sharvagroup.com", "role": "Admin", "courses": 3, "students": 9, "commission": 70 },
+      { "id": 2, "name": "Shah Kanchi", "email": "shah.k@sharvagroup.com", "role": "Instructor", "courses": 1, "students": 57, "commission": 65 },
+      { "id": 3, "name": "Vartika Mehta", "email": "vartika@sharvagroup.com", "role": "Instructor", "courses": 1, "students": 0, "commission": 60 }
+    ],
+    "groups": [
+      { "id": 1, "name": "BNI Power Team", "members": 4, "privacy": "Private" },
+      { "id": 2, "name": "Excel Learners", "members": 31, "privacy": "Public" }
+    ],
+    "discussions": [
+      { "id": 1, "topic": "Best tools for Gantt charts?", "course": "IT Project Management", "author": "Neha Sharma", "replies": 4, "date": "2026-02-28" },
+      { "id": 2, "topic": "Pivot table refresh issue", "course": "Microsoft Excel Advanced Excel Formulas & Functions", "author": "Riya Patel", "replies": 2, "date": "2026-03-01" }
+    ],
+    "certificates": [
+      { "id": 1, "name": "Excel Mastery Certificate", "course": "Microsoft Excel Advanced Excel Formulas & Functions", "student": "Kanchi S", "issued": "2026-06-10", "certificateId": "SGPRO-EXC-001", "orientation": "Landscape" },
+      { "id": 2, "name": "PM Completion Certificate", "course": "IT Project Management", "student": "Ankit Verma", "issued": "2026-06-18", "certificateId": "SGPRO-PM-001", "orientation": "Landscape" },
+      { "id": 3, "name": "Unconscious Bias Awareness Certificate", "course": "Unconscious bias training", "student": "Neha Sharma", "issued": "2026-07-01", "certificateId": "SGPRO-UB-001", "orientation": "Landscape" }
+    ],
+    "events": [
+      { "id": 1, "title": "Weekly Coaching Session — Excel", "host": "Shah Kanchi", "date": "2026-07-12 10:00 AM", "type": "Coaching", "description": "Weekly live coaching for Excel Advanced students" },
+      { "id": 2, "title": "Power BI Q&A Live Session", "host": "Mahesh MD", "date": "2026-07-15 03:00 PM", "type": "Webinar", "description": "Open Q&A for Power BI Masterclass students" },
+      { "id": 3, "title": "Unconscious Bias Workshop", "host": "Kanchi Shah", "date": "2026-07-19 11:00 AM", "type": "Workshop", "description": "Interactive workshop — Unconscious bias in the workplace" },
+      { "id": 4, "title": "IT Project Management Bootcamp", "host": "Mahesh MD", "date": "2026-07-26 10:00 AM", "type": "Bootcamp", "description": "Intensive one-day bootcamp for IT PM students" },
+      { "id": 5, "title": "BNI Trainers Orientation", "host": "Mahesh MD", "date": "2026-08-02 09:00 AM", "type": "Orientation", "description": "Onboarding session for BNI Power Team members" },
+      { "id": 6, "title": "Color Therapy Introduction", "host": "Vartika Mehta", "date": "2026-08-09 02:00 PM", "type": "Webinar", "description": "Introduction to color therapy principles with Vartika Mehta" }
+    ]
+  },
+  "activities": [
+    { "user": "Neha Sharma", "action": "completed Unit 2 in IT Project Management", "time": "2 hours ago" },
+    { "user": "Riya Patel", "action": "submitted assignment in Excel Advanced", "time": "5 hours ago" },
+    { "user": "Ankit Verma", "action": "enrolled in Power BI Masterclass", "time": "1 day ago" },
+    { "user": "Shah Kanchi", "action": "published a new quiz in Excel Advanced", "time": "1 day ago" },
+    { "user": "Kanchi S", "action": "posted a question in Q&A Discussions", "time": "2 days ago" }
+  ],
+  "messages": [
+    { "from": "Kanchi Shah", "preview": "Great progress on your assignment!", "time": "10:30 AM", "unread": true },
+    { "from": "Course Support", "preview": "Your quiz results are ready", "time": "Yesterday", "unread": true },
+    { "from": "Neha Sharma", "preview": "Thank you for the feedback", "time": "2 days ago", "unread": false }
+  ],
+  "users": [
+    {
+      "email": "maheshmd@sharvagroup.com",
+      "name": "Mahesh MD",
+      "role": "admin",
+      "password": "Growth$108@1610"
+    }
+  ]
+}
