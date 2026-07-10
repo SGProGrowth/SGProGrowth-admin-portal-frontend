@@ -9,12 +9,13 @@ import { entities } from '../data';
 import { initials } from '../lib/auth';
 import { Icon } from '../lib/icons';
 import { useToast } from '../lib/toast';
+import { getCertTemplate } from '../lib/settings';
 import { useStore } from '../store';
 import type { EntityDef, EntityRecord, PromoteConfig } from '../types';
 
 const BADGE_TONES = [
   'bg-emerald-100 text-emerald-700',
-  'bg-violet-100 text-violet-700',
+  'bg-brand-100 text-brand-700',
   'bg-sky-100 text-sky-700',
   'bg-pink-100 text-pink-700',
   'bg-amber-100 text-amber-700',
@@ -23,6 +24,95 @@ const BADGE_TONES = [
 
 const PILL_KEYS = ['status', 'stock', 'privacy'];
 const NUMERIC_KEYS = ['students', 'price', 'entries', 'issued', 'attempts', 'members', 'submissions', 'views', 'questions', 'awarded', 'replies'];
+
+function generateCertificatePdf(row: EntityRecord) {
+  const name = String(row.student ?? row.name ?? 'Student');
+  const course = String(row.course ?? '');
+  const issued = String(row.issued ?? new Date().toISOString().slice(0, 10));
+  const certId = String(row.certificateId ?? `SGPRO-${row.id}`);
+  const certName = String(row.name ?? 'Certificate of Completion');
+  const template = getCertTemplate();
+  const siteName = localStorage.getItem('brand_name') || 'SG Pro Growth';
+  const primary = localStorage.getItem('brand_primary') || '#1a4d3e';
+  const accent = localStorage.getItem('brand_accent') || '#248f6f';
+
+  const templateBg = template
+    ? `.page { background: url('${template}') center/cover no-repeat; }
+       .border-outer, .border-inner, .watermark { display: none; }`
+    : '';
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>${certName}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:297mm; height:210mm; background:#fff; font-family:'Inter',sans-serif; }
+  .page { width:297mm; height:210mm; position:relative; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20mm 22mm; }
+  ${templateBg}
+  .border-outer { position:absolute; inset:8mm; border:3px solid ${primary}; border-radius:4mm; pointer-events:none; }
+  .border-inner { position:absolute; inset:11mm; border:1px solid ${primary}55; border-radius:3mm; pointer-events:none; }
+  .logo { text-align:center; margin-bottom:6mm; }
+  .logo-text { font-family:'Playfair Display',serif; font-size:18pt; font-weight:700; color:${primary}; letter-spacing:2px; }
+  .logo-sub { font-size:8pt; color:${accent}; letter-spacing:4px; text-transform:uppercase; margin-top:1mm; }
+  .divider { width:60mm; height:0.5px; background:linear-gradient(to right,transparent,${primary},transparent); margin:4mm auto; }
+  .presents { font-size:9pt; color:#64748b; text-align:center; letter-spacing:2px; text-transform:uppercase; margin-bottom:3mm; }
+  .student-name { font-family:'Playfair Display',serif; font-size:36pt; font-weight:700; color:#0f2d1f; text-align:center; line-height:1.1; margin-bottom:5mm; border-bottom:2px solid ${primary}; padding-bottom:3mm; min-width:180mm; }
+  .for-text { font-size:9pt; color:#64748b; text-align:center; letter-spacing:1px; margin-bottom:2mm; }
+  .course-name { font-family:'Playfair Display',serif; font-size:16pt; color:${primary}; text-align:center; margin-bottom:6mm; font-style:italic; }
+  .meta { display:flex; justify-content:space-between; width:100%; margin-top:6mm; }
+  .meta-item { text-align:center; flex:1; }
+  .meta-label { font-size:7pt; color:#94a3b8; text-transform:uppercase; letter-spacing:2px; display:block; margin-bottom:1mm; }
+  .meta-value { font-size:9pt; font-weight:600; color:#334155; }
+  .sig-line { width:40mm; height:0.5px; background:#334155; margin:0 auto 1mm; }
+  .watermark { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0.03; font-family:'Playfair Display',serif; font-size:80pt; font-weight:700; color:${primary}; pointer-events:none; transform:rotate(-30deg); }
+  .content { position:relative; z-index:1; width:100%; display:flex; flex-direction:column; align-items:center; }
+  @media print { body{-webkit-print-color-adjust:exact; print-color-adjust:exact;} }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="border-outer"></div>
+  <div class="border-inner"></div>
+  <div class="watermark">SG PRO</div>
+  <div class="content">
+  <div class="logo">
+    <div class="logo-text">${siteName}</div>
+    <div class="logo-sub">Professional Learning Platform</div>
+  </div>
+  <div class="divider"></div>
+  <div class="presents">This is to certify that</div>
+  <div class="student-name">${name}</div>
+  <div class="for-text">has successfully completed</div>
+  <div class="course-name">${course}</div>
+  <div class="meta">
+    <div class="meta-item">
+      <span class="meta-label">Certificate ID</span>
+      <div class="sig-line"></div>
+      <span class="meta-value">${certId}</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Issued by</span>
+      <div class="sig-line"></div>
+      <span class="meta-value">${siteName}</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Date of Issue</span>
+      <div class="sig-line"></div>
+      <span class="meta-value">${issued}</span>
+    </div>
+  </div>
+  </div>
+</div>
+<script>window.onload=function(){window.print();}</script>
+</body>
+</html>`;
+
+  const w = window.open('', '_blank', 'width=1200,height=800');
+  if (w) { w.document.write(html); w.document.close(); }
+}
 
 export function EntityPage() {
   const { entity = '' } = useParams();
@@ -140,7 +230,7 @@ export function EntityPage() {
                 onClick={() => setStatusFilter(opt)}
                 className={`rounded-lg px-3 py-1.5 text-xs font-semibold capitalize transition ${
                   statusFilter === opt
-                    ? 'bg-gradient-to-r from-brand-600 to-accent-600 text-white'
+                    ? 'bg-brand-600 text-white'
                     : 'border border-slate-200 text-slate-500 hover:border-brand-400 hover:text-brand-600'
                 }`}
               >
@@ -173,6 +263,7 @@ export function EntityPage() {
           onView={setViewing}
           promote={def.promote}
           onPromote={handlePromote}
+          entity={entity}
         />
       )}
 
@@ -211,6 +302,11 @@ export function EntityPage() {
               <Button variant="danger" icon="trash" onClick={() => handleDelete(viewing)}>
                 Delete
               </Button>
+              {entity === 'certificates' && (
+                <Button icon="download" variant="secondary" onClick={() => generateCertificatePdf(viewing)}>
+                  Download PDF
+                </Button>
+              )}
               <Button
                 icon="edit"
                 onClick={() => {
@@ -284,7 +380,7 @@ function RoleBadge({ value, adminValue }: { value: string; adminValue: string })
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
-        isAdmin ? 'bg-gradient-to-r from-brand-600 to-accent-600 text-white' : 'bg-slate-100 text-slate-600'
+        isAdmin ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-600'
       }`}
     >
       {isAdmin && <Icon name="shield" size={11} />}
@@ -328,6 +424,7 @@ function TableView({
   onView,
   promote,
   onPromote,
+  entity,
 }: {
   rows: EntityRecord[];
   columns: string[];
@@ -337,6 +434,7 @@ function TableView({
   onView: (r: EntityRecord) => void;
   promote?: PromoteConfig;
   onPromote?: (r: EntityRecord) => void;
+  entity?: string;
 }) {
   const labelOf = (k: string) => labels.find((l) => l.key === k)?.label ?? k;
   if (rows.length === 0) return null;
@@ -377,13 +475,22 @@ function TableView({
                 ))}
                 <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                   <div className="flex justify-end gap-1">
+                    {entity === 'certificates' && (
+                      <button
+                        onClick={() => generateCertificatePdf(row)}
+                        className="rounded-lg p-1.5 text-slate-400 transition hover:bg-emerald-50 hover:text-emerald-600"
+                        title="Download Certificate PDF"
+                      >
+                        <Icon name="download" size={16} />
+                      </button>
+                    )}
                     {promote && onPromote && (
                       <button
                         onClick={() => onPromote(row)}
                         className={`mr-1 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition ${
                           String(row[promote.field]) === promote.to
                             ? 'border border-slate-200 text-slate-500 hover:border-rose-300 hover:text-rose-600'
-                            : 'bg-gradient-to-r from-brand-600 to-accent-600 text-white hover:brightness-105'
+                            : 'bg-brand-600 text-white hover:brightness-105'
                         }`}
                         title={String(row[promote.field]) === promote.to ? promote.revertLabel : promote.label}
                       >
@@ -452,7 +559,7 @@ function CourseCardGrid({
           <div className="flex flex-1 flex-col p-4">
             <h3 className="mb-2 line-clamp-2 text-sm font-bold text-slate-800">{c.title}</h3>
             <div className="mb-2 flex items-center gap-2 text-xs text-slate-500">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-brand-600 to-accent-600 text-[8px] font-bold text-white">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-600 text-[8px] font-bold text-white">
                 {initials(String(c.instructor))}
               </span>
               {c.instructor}
@@ -513,7 +620,7 @@ function RecordCardGrid({
           onClick={() => onView(c)}
           className="flex cursor-pointer flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100 transition hover:shadow-lg hover:ring-brand-200"
         >
-          <div className="flex items-center justify-between gap-2 bg-gradient-to-r from-brand-600 to-accent-600 px-4 py-3">
+          <div className="flex items-center justify-between gap-2 bg-brand-600 px-4 py-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 text-white">
               <Icon name={def.icon} size={20} />
             </span>

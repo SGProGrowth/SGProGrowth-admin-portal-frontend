@@ -61,6 +61,7 @@ export interface ActivityItem {
 }
 
 export interface MessageItem {
+  id?: number;
   from: string;
   preview: string;
   time: string;

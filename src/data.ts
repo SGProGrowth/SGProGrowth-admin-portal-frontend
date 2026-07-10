@@ -62,25 +62,6 @@ export const entities: Record<string, EntityDef> = {
     ],
   },
 
-  units: {
-    key: 'units',
-    label: 'Units', singular: 'Unit', icon: 'list', group: 'learning',
-    columns: ['title', 'course', 'type', 'duration', 'order'],
-    fields: [
-      { key: 'title', label: 'Unit Title', type: 'text', required: true },
-      { key: 'course', label: 'Course', type: 'select', options: COURSE_NAMES },
-      { key: 'type', label: 'Type', type: 'select', options: ['video', 'text', 'audio', 'document'] },
-      { key: 'duration', label: 'Duration', type: 'text' },
-      { key: 'order', label: 'Order', type: 'number' },
-    ],
-    seed: [
-      { id: 1, title: 'Introduction to PM', course: COURSE_NAMES[5], type: 'video', duration: '45 min', order: 1 },
-      { id: 2, title: 'Agile Methodologies', course: COURSE_NAMES[5], type: 'text', duration: '30 min', order: 2 },
-      { id: 3, title: 'VLOOKUP & INDEX-MATCH', course: COURSE_NAMES[0], type: 'video', duration: '1 hr', order: 1 },
-      { id: 4, title: 'Pivot Tables Deep Dive', course: COURSE_NAMES[0], type: 'video', duration: '50 min', order: 2 },
-    ],
-  },
-
   quizzes: {
     key: 'quizzes',
     label: 'Quizzes', singular: 'Quiz', icon: 'help-circle', group: 'learning',
@@ -132,40 +113,6 @@ export const entities: Record<string, EntityDef> = {
     ],
   },
 
-  h5p: {
-    key: 'h5p',
-    label: 'H5P Content', singular: 'H5P Item', icon: 'layers', group: 'learning',
-    columns: ['title', 'type', 'course', 'views'],
-    fields: [
-      { key: 'title', label: 'Title', type: 'text', required: true },
-      { key: 'type', label: 'Content Type', type: 'select', options: ['Interactive Video', 'Course Presentation', 'Quiz (Question Set)', 'Drag and Drop', 'Flashcards'] },
-      { key: 'course', label: 'Used In', type: 'select', options: COURSE_NAMES },
-      { key: 'views', label: 'Views', type: 'number' },
-    ],
-    seed: [
-      { id: 1, title: 'PM Terminology Flashcards', type: 'Flashcards', course: COURSE_NAMES[5], views: 88 },
-      { id: 2, title: 'Excel Interactive Walkthrough', type: 'Interactive Video', course: COURSE_NAMES[0], views: 156 },
-    ],
-  },
-
-  achievements: {
-    key: 'achievements',
-    label: 'Achievements', singular: 'Achievement', icon: 'badge', group: 'learning',
-    columns: ['title', 'type', 'criteria', 'points', 'awarded'],
-    fields: [
-      { key: 'title', label: 'Badge Title', type: 'text', required: true },
-      { key: 'type', label: 'Type', type: 'select', options: ['Badge', 'Certificate', 'Points', 'Rank'] },
-      { key: 'criteria', label: 'Criteria', type: 'text' },
-      { key: 'points', label: 'Points', type: 'number' },
-      { key: 'awarded', label: 'Awarded', type: 'number' },
-    ],
-    seed: [
-      { id: 1, title: 'Fast Starter', type: 'Badge', criteria: 'Complete first unit', points: 10, awarded: 34 },
-      { id: 2, title: 'Course Champion', type: 'Badge', criteria: 'Finish any course 100%', points: 50, awarded: 12 },
-      { id: 3, title: 'Quiz Master', type: 'Rank', criteria: 'Score 90%+ on 3 quizzes', points: 75, awarded: 6 },
-    ],
-  },
-
   students: {
     key: 'students',
     label: 'Students', singular: 'Student', icon: 'users', group: 'people',
@@ -205,23 +152,6 @@ export const entities: Record<string, EntityDef> = {
     ],
   },
 
-  users: {
-    key: 'users',
-    label: 'Users', singular: 'User', icon: 'user', group: 'people',
-    columns: ['name', 'email', 'role', 'status'],
-    fields: [
-      { key: 'name', label: 'Display Name', type: 'text', required: true },
-      { key: 'email', label: 'Email', type: 'text', required: true },
-      { key: 'role', label: 'Role', type: 'select', options: ['Administrator', 'Instructor', 'Student', 'Subscriber'] },
-      { key: 'status', label: 'Status', type: 'select', options: ['active', 'pending', 'suspended'] },
-    ],
-    seed: [
-      { id: 1, name: 'Mahesh MD', email: 'maheshmd@sharvagroup.com', role: 'Administrator', status: 'active' },
-      { id: 2, name: 'Neha Sharma', email: 'neha.s@email.com', role: 'Student', status: 'active' },
-      { id: 3, name: 'Shah Kanchi', email: 'shah.k@sharvagroup.com', role: 'Instructor', status: 'active' },
-    ],
-  },
-
   groups: {
     key: 'groups',
     label: 'Groups', singular: 'Group', icon: 'users', group: 'people',
@@ -254,39 +184,6 @@ export const entities: Record<string, EntityDef> = {
     ],
   },
 
-  products: {
-    key: 'products',
-    label: 'Products', singular: 'Product', icon: 'tag', group: 'commerce', view: 'cards',
-    columns: ['name', 'type', 'price', 'stock'],
-    fields: [
-      { key: 'name', label: 'Product Name', type: 'text', required: true },
-      { key: 'type', label: 'Type', type: 'select', options: ['Course', 'Bundle', 'Membership', 'Coaching'] },
-      { key: 'price', label: 'Price (\u20b9)', type: 'number' },
-      { key: 'stock', label: 'Stock', type: 'select', options: ['In stock', 'Out of stock'] },
-    ],
-    seed: [
-      { id: 1, name: 'IT Project Management', type: 'Course', price: 108, stock: 'In stock' },
-      { id: 2, name: 'Career Coaching Bundle', type: 'Bundle', price: 4999, stock: 'In stock' },
-    ],
-  },
-
-  orders: {
-    key: 'orders',
-    label: 'Orders', singular: 'Order', icon: 'shopping', group: 'commerce',
-    columns: ['customer', 'product', 'total', 'status', 'date'],
-    fields: [
-      { key: 'customer', label: 'Customer', type: 'text', required: true },
-      { key: 'product', label: 'Product', type: 'text' },
-      { key: 'total', label: 'Total (\u20b9)', type: 'number' },
-      { key: 'status', label: 'Status', type: 'select', options: ['completed', 'processing', 'pending', 'refunded'] },
-      { key: 'date', label: 'Date', type: 'date' },
-    ],
-    seed: [
-      { id: 1051, customer: 'Neha Sharma', product: 'IT Project Management', total: 108, status: 'completed', date: '2026-02-10' },
-      { id: 1052, customer: 'Ankit Verma', product: 'Career Coaching Bundle', total: 4999, status: 'processing', date: '2026-03-01' },
-    ],
-  },
-
   certificates: {
     key: 'certificates',
     label: 'Certificate Templates', singular: 'Certificate', icon: 'badge', group: 'commerce', view: 'cards',
@@ -300,39 +197,6 @@ export const entities: Record<string, EntityDef> = {
     seed: [
       { id: 1, name: 'Excel Mastery Certificate', course: COURSE_NAMES[0], issued: 2, orientation: 'Landscape' },
       { id: 2, name: 'PM Completion Certificate', course: COURSE_NAMES[5], issued: 0, orientation: 'Landscape' },
-    ],
-  },
-
-  news: {
-    key: 'news',
-    label: 'News & Posts', singular: 'Post', icon: 'file', group: 'content', view: 'cards',
-    columns: ['title', 'author', 'status', 'date'],
-    fields: [
-      { key: 'title', label: 'Title', type: 'text', required: true },
-      { key: 'author', label: 'Author', type: 'text' },
-      { key: 'status', label: 'Status', type: 'select', options: ['published', 'draft', 'pending'] },
-      { key: 'date', label: 'Date', type: 'date' },
-    ],
-    seed: [
-      { id: 1, title: 'Why Online Courses Alone Don\u2019t Work', author: 'Mahesh MD', status: 'published', date: '2026-01-15' },
-      { id: 2, title: 'How SGProGrowth Changes Everything', author: 'Mahesh MD', status: 'published', date: '2026-02-01' },
-    ],
-  },
-
-  testimonials: {
-    key: 'testimonials',
-    label: 'Testimonials', singular: 'Testimonial', icon: 'quote', group: 'content', view: 'cards',
-    columns: ['author', 'role', 'status'],
-    fields: [
-      { key: 'author', label: 'Author', type: 'text', required: true },
-      { key: 'role', label: 'Role', type: 'text' },
-      { key: 'text', label: 'Testimonial', type: 'textarea' },
-      { key: 'status', label: 'Status', type: 'select', options: ['published', 'draft'] },
-    ],
-    seed: [
-      { id: 1, author: 'Neha', role: 'Software Engineer', text: 'Personalised roadmap made me confident to interview and deliver on projects.', status: 'published' },
-      { id: 2, author: 'Riya', role: 'Data Analyst', text: 'The mentoring kept me motivated and focused.', status: 'published' },
-      { id: 3, author: 'Ankit', role: 'Cloud Engineer', text: 'SG ProGrowth coaching helped me find the right AWS certification.', status: 'published' },
     ],
   },
 
@@ -352,36 +216,6 @@ export const entities: Record<string, EntityDef> = {
     ],
   },
 
-  forms: {
-    key: 'forms',
-    label: 'Forms', singular: 'Form', icon: 'clipboard', group: 'content', view: 'cards',
-    columns: ['name', 'entries', 'status'],
-    fields: [
-      { key: 'name', label: 'Form Name', type: 'text', required: true },
-      { key: 'entries', label: 'Entries', type: 'number' },
-      { key: 'status', label: 'Status', type: 'select', options: ['active', 'inactive'] },
-    ],
-    seed: [
-      { id: 1, name: 'Contact Us', entries: 24, status: 'active' },
-      { id: 2, name: 'Course Enquiry', entries: 51, status: 'active' },
-    ],
-  },
-
-  media: {
-    key: 'media',
-    label: 'Media Library', singular: 'Media', icon: 'image', group: 'content',
-    columns: ['name', 'type', 'size', 'uploaded'],
-    fields: [
-      { key: 'name', label: 'File Name', type: 'text', required: true },
-      { key: 'type', label: 'Type', type: 'select', options: ['Image', 'Video', 'PDF', 'Audio'] },
-      { key: 'size', label: 'Size', type: 'text' },
-      { key: 'uploaded', label: 'Uploaded', type: 'date' },
-    ],
-    seed: [
-      { id: 1, name: 'excel-thumbnail.png', type: 'Image', size: '240 KB', uploaded: '2025-07-10' },
-      { id: 2, name: 'pm-intro.mp4', type: 'Video', size: '48 MB', uploaded: '2025-08-02' },
-    ],
-  },
 };
 
 export const nav: NavGroup[] = [
@@ -391,19 +225,20 @@ export const nav: NavGroup[] = [
       { id: 'dashboard', label: 'Dashboard', icon: 'grid' },
       { id: 'activity', label: 'Activity', icon: 'activity' },
       { id: 'calendar', label: 'Calendar', icon: 'calendar' },
-      { id: 'messages', label: 'Messages', icon: 'mail', badge: '2' },
+      { id: 'messages', label: 'Messages', icon: 'mail' },
+    ],
+  },
+  {
+    title: 'Intelligence',
+    items: [
+      { id: 'digital-twin', label: 'Digital Twin', icon: 'cube', badge: '3D' },
+      { id: 'assistant', label: 'AI Assistant', icon: 'bot', badge: 'AI' },
     ],
   },
   {
     title: 'Learning',
     items: [
       { id: 'courses', label: 'Courses', icon: 'book-open' },
-      { id: 'units', label: 'Units', icon: 'list' },
-      { id: 'quizzes', label: 'Quizzes', icon: 'help-circle' },
-      { id: 'questions', label: 'Questions', icon: 'edit' },
-      { id: 'assignments', label: 'Assignments', icon: 'clipboard' },
-      { id: 'h5p', label: 'H5P Content', icon: 'layers' },
-      { id: 'achievements', label: 'Achievements', icon: 'badge' },
     ],
   },
   {
@@ -411,33 +246,19 @@ export const nav: NavGroup[] = [
     items: [
       { id: 'students', label: 'Students', icon: 'users' },
       { id: 'instructors', label: 'Instructors', icon: 'award' },
-      { id: 'users', label: 'Users', icon: 'user' },
       { id: 'groups', label: 'Groups', icon: 'users' },
-      { id: 'discussions', label: 'Q&A Discussions', icon: 'message' },
     ],
   },
   {
-    title: 'Commerce',
+    title: 'Finance',
     items: [
-      { id: 'products', label: 'Products', icon: 'tag' },
-      { id: 'orders', label: 'Orders', icon: 'shopping' },
-      { id: 'certificates', label: 'Certificates', icon: 'badge' },
-    ],
-  },
-  {
-    title: 'Content',
-    items: [
-      { id: 'news', label: 'News & Posts', icon: 'file' },
-      { id: 'testimonials', label: 'Testimonials', icon: 'quote' },
-      { id: 'events', label: 'Events', icon: 'calendar' },
-      { id: 'forms', label: 'Forms', icon: 'clipboard' },
-      { id: 'media', label: 'Media', icon: 'image' },
+      { id: 'payments', label: 'Payments & Payouts', icon: 'credit-card' },
+      { id: 'reports', label: 'Reports', icon: 'bar-chart' },
     ],
   },
   {
     title: 'System',
     items: [
-      { id: 'reports', label: 'Reports', icon: 'bar-chart' },
       { id: 'settings', label: 'Settings', icon: 'settings' },
       { id: 'profile', label: 'Profile', icon: 'user' },
     ],
@@ -448,7 +269,7 @@ export const activities: ActivityItem[] = [
   { user: 'Neha Sharma', action: 'completed Unit 2 in IT Project Management', time: '2 hours ago' },
   { user: 'Riya Patel', action: 'submitted assignment in Excel Advanced', time: '5 hours ago' },
   { user: 'Ankit Verma', action: 'enrolled in Power BI Masterclass', time: '1 day ago' },
-  { user: 'System', action: 'New order #1052 received (\u20b94,999)', time: '1 day ago' },
+  { user: 'Shah Kanchi', action: 'published a new quiz in Excel Advanced', time: '1 day ago' },
   { user: 'Kanchi S', action: 'posted a question in Q&A Discussions', time: '2 days ago' },
 ];
 

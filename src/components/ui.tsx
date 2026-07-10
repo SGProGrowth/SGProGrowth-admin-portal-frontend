@@ -31,7 +31,7 @@ export function Avatar({
   return (
     <div
       style={{ ...dim, fontSize: Math.round(size * 0.4) }}
-      className={`flex items-center justify-center ${rounded} bg-gradient-to-br from-brand-600 to-accent-600 font-bold text-white ${className}`}
+      className={`flex items-center justify-center ${rounded} bg-brand-600 font-bold text-white ${className}`}
     >
       {initials(name)}
     </div>
@@ -46,6 +46,7 @@ export function Button({
   form,
   icon,
   className = '',
+  disabled = false,
 }: {
   children: ReactNode;
   onClick?: () => void;
@@ -54,21 +55,23 @@ export function Button({
   form?: string;
   icon?: string;
   className?: string;
+  disabled?: boolean;
 }) {
   const styles: Record<string, string> = {
     primary:
-      'bg-gradient-to-r from-brand-600 to-accent-600 text-white shadow-sm shadow-brand-600/30 hover:shadow-md hover:shadow-brand-600/40 hover:brightness-105',
-    secondary: 'bg-white text-slate-700 border border-slate-200 hover:border-brand-400 hover:text-brand-600',
+      'bg-brand-600 text-white hover:bg-brand-700',
+    secondary: 'bg-white text-gray-700 border border-gray-200 hover:border-brand-400 hover:text-brand-600',
     danger: 'bg-rose-600 text-white hover:bg-rose-700',
     ghost: 'text-slate-500 hover:bg-slate-100 hover:text-slate-700',
   };
   return (
     <motion.button
-      whileTap={{ scale: 0.96 }}
+      whileTap={disabled ? undefined : { scale: 0.96 }}
       type={type}
       form={form}
+      disabled={disabled}
       onClick={onClick}
-      className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition ${styles[variant]} ${className}`}
+      className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${styles[variant]} ${className}`}
     >
       {icon && <Icon name={icon} size={16} />}
       {children}
@@ -115,17 +118,19 @@ export function StatCard({
   icon: string;
   value: ReactNode;
   label: string;
-  tone?: 'brand' | 'violet' | 'emerald' | 'amber';
+  tone?: 'brand' | 'forest' | 'mint' | 'amber' | 'violet' | 'emerald';
   delay?: number;
   to?: string;
   onClick?: () => void;
   hint?: string;
 }) {
   const tones: Record<string, string> = {
-    brand: 'bg-brand-100 text-brand-700',
-    violet: 'bg-violet-100 text-violet-700',
-    emerald: 'bg-emerald-100 text-emerald-700',
-    amber: 'bg-amber-100 text-amber-700',
+    brand: 'bg-brand-50 text-brand-700',
+    forest: 'bg-emerald-50 text-emerald-800',
+    mint: 'bg-brand-100 text-brand-800',
+    amber: 'bg-amber-50 text-amber-800',
+    violet: 'bg-emerald-50 text-emerald-800',
+    emerald: 'bg-emerald-50 text-emerald-800',
   };
   const interactive = Boolean(to || onClick);
   const inner = (
@@ -134,16 +139,16 @@ export function StatCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.3 }}
       whileHover={interactive ? { y: -4 } : undefined}
-      className={`group flex items-center gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100 ${
-        interactive ? 'cursor-pointer hover:shadow-md hover:ring-brand-200' : ''
+      className={`group flex items-center gap-4 rounded-lg border border-gray-100 bg-white p-5 shadow-sm ${
+        interactive ? 'cursor-pointer hover:border-brand-200 hover:shadow-md' : ''
       }`}
     >
       <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${tones[tone]}`}>
         <Icon name={icon} size={22} />
       </div>
       <div className="min-w-0">
-        <div className="text-2xl font-extrabold leading-none text-slate-800">{value}</div>
-        <div className="mt-1 truncate text-xs font-medium text-slate-500">{label}</div>
+        <div className="text-2xl font-extrabold leading-none text-gray-800">{value}</div>
+        <div className="mt-1 truncate text-xs font-medium text-gray-500">{label}</div>
       </div>
       {interactive && (
         <span className="ml-auto hidden text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-brand-500 sm:block">
@@ -159,7 +164,7 @@ export function StatCard({
 
 export function PageCard({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100 ${className}`}>
+    <div className={`rounded-lg border border-gray-100 bg-white p-6 shadow-sm ${className}`}>
       {children}
     </div>
   );

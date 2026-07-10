@@ -1,23 +1,23 @@
 @import 'tailwindcss';
 
 @theme {
-  /* Brand — refined indigo / blue with depth */
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-200: #c7d2fe;
-  --color-brand-300: #a5b4fc;
-  --color-brand-400: #818cf8;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
-  --color-brand-800: #3730a3;
-  --color-brand-900: #232058;
-  --color-brand-950: #14132e;
+  /* SG Pro Growth — forest green brand */
+  --color-brand-50: #ecfdf5;
+  --color-brand-100: #d1fae5;
+  --color-brand-200: #a7f3d0;
+  --color-brand-300: #6ee7b7;
+  --color-brand-400: #34d399;
+  --color-brand-500: #248f6f;
+  --color-brand-600: #1a4d3e;
+  --color-brand-700: #164033;
+  --color-brand-800: #123528;
+  --color-brand-900: #0f2d22;
+  --color-brand-950: #0a1f18;
 
-  /* Secondary accent — violet / fuchsia for highlights */
-  --color-accent-400: #c084fc;
-  --color-accent-500: #a855f7;
-  --color-accent-600: #9333ea;
+  /* Accent — lighter green highlights (replaces violet) */
+  --color-accent-400: #6ee7b7;
+  --color-accent-500: #34d399;
+  --color-accent-600: #248f6f;
 
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
@@ -60,26 +60,43 @@ body,
 body {
   margin: 0;
   font-family: var(--font-sans);
-  color: #0f172a;
-  background-color: #eef1f8;
-  background-image:
-    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 55%),
-    radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.07) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.06) 0px, transparent 55%);
-  background-attachment: fixed;
+  color: #111827;
+  background-color: #f9fafb;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Utilities */
+/* Theme utilities */
 .glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
 }
 .text-gradient {
-  background: linear-gradient(90deg, var(--color-brand-600), var(--color-accent-500));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-brand-600);
+}
+.alert-info {
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-brand-200);
+  background-color: var(--color-brand-50);
+  color: var(--color-brand-800);
+}
+.alert-warn {
+  border-radius: 0.5rem;
+  border: 1px solid #fde68a;
+  background-color: #fefce8;
+  color: #713f12;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  background-color: var(--color-brand-600);
+  color: white;
+  font-weight: 600;
+  transition: background-color 0.15s;
+}
+.btn-primary:hover {
+  background-color: var(--color-brand-700);
 }
 .scene-3d {
   perspective: 1000px;
@@ -93,9 +110,9 @@ body {
   height: 9px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.35);
+  background: rgba(26, 77, 62, 0.25);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.55);
+  background: rgba(26, 77, 62, 0.4);
 }
