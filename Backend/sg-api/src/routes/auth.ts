@@ -17,6 +17,7 @@ import { findUserByEmail, findUserById, update2fa, updateUser } from '../db.js';
 import { config } from '../config.js';
 import { requireAuth, signToken } from '../middleware/auth.js';
 import type { AuthedRequest } from '../middleware/auth.js';
+import { getSettings, validatePassword } from '../services/settings-config.js';
 
 const router = Router();
 
@@ -34,6 +35,15 @@ router.post('/login', async (req, res) => {
   const account = await findUserByEmail(email);
   if (!account?.passwordHash || !bcrypt.compareSync(password, account.passwordHash)) {
     res.status(401).json({ error: 'Invalid email or password' });
+    return;
+  }
+
+  const settings = getSettings();
+  const isAdmin = account.role === 'admin' || account.role === 'Administrator';
+  if (settings.security.require2faForAdmins && isAdmin && !account.twoFactorEnabled) {
+    res.status(403).json({
+      error: 'Two-factor authentication is required for admin accounts. Enable 2FA in Profile → Security first.',
+    });
     return;
   }
 
@@ -95,6 +105,15 @@ router.post('/2fa/login', async (req, res) => {
   res.json({ user: { ...user, loggedIn: true }, token: signToken(user) });
 });
 
+router.get('/time', (_req, res) => {
+  const now = new Date();
+  res.json({
+    serverTime: now.toISOString(),
+    epochSeconds: Math.floor(now.getTime() / 1000),
+    period: Math.floor(now.getTime() / 1000 / 30),
+  });
+});
+
 // ── /me ───────────────────────────────────────────────────────────────────────
 
 router.get('/me', requireAuth, (req: AuthedRequest, res) => {
@@ -114,8 +133,11 @@ router.post('/change-password', requireAuth, async (req: AuthedRequest, res) => 
     res.status(400).json({ error: 'currentPassword and newPassword are required' });
     return;
   }
-  if (newPassword.length < 8) {
-    res.status(400).json({ error: 'New password must be at least 8 characters' });
+
+  const settings = getSettings();
+  const pwdError = validatePassword(newPassword, settings.security.forceStrongPasswords);
+  if (pwdError) {
+    res.status(400).json({ error: pwdError });
     return;
   }
 

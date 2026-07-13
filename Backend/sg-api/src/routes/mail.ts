@@ -1,6 +1,8 @@
 import { Router } from 'express';
+import { appendMessage } from '../db.js';
 import { requireAdmin } from '../middleware/admin.js';
 import { requireAuth } from '../middleware/auth.js';
+import { notifyAdminIfEnabled } from '../services/notifications.js';
 import {
   getMailSettingsPublic,
   saveMailSettings,
@@ -67,6 +69,21 @@ router.post('/compose', async (req, res) => {
     ? `<div style="font-family:sans-serif;font-size:14px;line-height:1.6">${text.replace(/\n/g, '<br/>')}</div>`
     : undefined;
   const result = await sendMail({ to: to.trim(), subject: subject.trim(), text: text ?? '', html });
+  if (result.ok) {
+    const now = new Date();
+    const time = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    await appendMessage({
+      from: `To: ${to.trim()}`,
+      preview: subject.trim(),
+      time,
+      unread: false,
+    });
+    void notifyAdminIfEnabled(
+      'message',
+      'Email sent',
+      `You sent "${subject.trim()}" to ${to.trim()}.`,
+    ).catch(() => undefined);
+  }
   res.status(result.ok ? 200 : 502).json(result);
 });
 

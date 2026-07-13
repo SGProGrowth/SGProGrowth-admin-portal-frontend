@@ -27,6 +27,8 @@ export interface StorageAdapter {
   update2fa(id: number, patch: { twoFactorSecret?: string | null; twoFactorEnabled?: boolean }): Promise<boolean>;
   deleteUser(id: number): Promise<boolean>;
   getActivities(): Promise<ActivityItem[]>;
+  appendActivity(item: ActivityItem): Promise<void>;
   getMessages(): Promise<MessageItem[]>;
+  appendMessage(item: Omit<MessageItem, 'id'>): Promise<MessageItem>;
   markMessageRead(id: number): Promise<boolean>;
 }

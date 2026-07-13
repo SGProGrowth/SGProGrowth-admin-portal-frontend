@@ -1,21 +1,21 @@
 import { useCallback, useEffect, useState } from 'react';
-import { activities as fallbackActivities, messages as fallbackMessages } from '../data';
 import type { ActivityItem, MessageItem } from '../types';
 import { apiFetch, isApiEnabled } from './api';
 import { hasValidToken } from './auth';
 
 export function useActivities() {
-  const [items, setItems] = useState<ActivityItem[]>(fallbackActivities);
+  const [items, setItems] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(isApiEnabled());
 
   useEffect(() => {
     if (!isApiEnabled() || !hasValidToken()) {
+      setItems([]);
       setLoading(false);
       return;
     }
     void apiFetch<ActivityItem[]>('/feed/activities')
       .then(setItems)
-      .catch(() => setItems(fallbackActivities))
+      .catch(() => setItems([]))
       .finally(() => setLoading(false));
   }, []);
 
@@ -23,16 +23,20 @@ export function useActivities() {
 }
 
 export function useMessages() {
-  const [items, setItems] = useState<MessageItem[]>(fallbackMessages);
+  const [items, setItems] = useState<MessageItem[]>([]);
   const [loading, setLoading] = useState(isApiEnabled());
 
   const reload = useCallback(() => {
-    if (!isApiEnabled() || !hasValidToken()) return Promise.resolve();
-    return apiFetch<MessageItem[]>('/feed/messages').then(setItems);
+    if (!isApiEnabled() || !hasValidToken()) {
+      setItems([]);
+      return Promise.resolve();
+    }
+    return apiFetch<MessageItem[]>('/feed/messages').then(setItems).catch(() => setItems([]));
   }, []);
 
   useEffect(() => {
     if (!isApiEnabled() || !hasValidToken()) {
+      setItems([]);
       setLoading(false);
       return;
     }

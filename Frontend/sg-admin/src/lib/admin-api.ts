@@ -1,4 +1,4 @@
-import { apiFetch, isApiEnabled } from './api';
+import { apiFetch, newApiFetch, isApiEnabled } from './api';
 
 export async function uploadImage(file: File): Promise<string | null> {
   if (!isApiEnabled()) return null;
@@ -201,4 +201,109 @@ export async function verify2faLogin(input: {
   code: string;
 }): Promise<{ user: { email: string; name: string; role: string; loggedIn: boolean }; token: string }> {
   return apiFetch('/auth/2fa/login', { method: 'POST', body: JSON.stringify(input) });
+}
+// ── Real LMS data (new NestJS/Prisma backend) ──────────────────────────────
+// Everything below reads/writes the actual student/instructor/course data
+// students and instructors use day to day — separate from the portal-login
+// accounts managed by listAdminUsers/createAdminUser above (those stay on
+// the legacy backend). Same JWT is reused via the issuer/audience bridge.
+
+export interface LmsUser {
+  id: string;
+  email: string;
+  name: string;
+  status: 'active' | 'suspended' | 'pending';
+  roles: string[];
+  emailVerified: boolean;
+  lastLoginAt: string | null;
+  createdAt: string;
+}
+
+export interface LmsUserListResponse {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  users: LmsUser[];
+}
+
+export async function listLmsUsers(query: {
+  search?: string;
+  role?: string;
+  status?: string;
+  page?: number;
+  pageSize?: number;
+} = {}): Promise<LmsUserListResponse> {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    if (value !== undefined && value !== '') params.set(key, String(value));
+  }
+  const qs = params.toString();
+  return newApiFetch<LmsUserListResponse>(`/admin/users${qs ? `?${qs}` : ''}`);
+}
+
+export async function getLmsUser(id: string) {
+  return newApiFetch(`/admin/users/${id}`);
+}
+
+export async function updateLmsUserStatus(id: string, status: 'active' | 'suspended' | 'pending') {
+  return newApiFetch(`/admin/users/${id}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+  });
+}
+
+export async function assignLmsUserRole(id: string, role: string) {
+  return newApiFetch(`/admin/users/${id}/roles`, {
+    method: 'POST',
+    body: JSON.stringify({ role }),
+  });
+}
+
+export async function revokeLmsUserRole(id: string, role: string) {
+  return newApiFetch(`/admin/users/${id}/roles/revoke`, {
+    method: 'POST',
+    body: JSON.stringify({ role }),
+  });
+}
+
+export interface LmsCourse {
+  id: string;
+  title: string;
+  slug: string;
+  status: string;
+  visibility: string;
+  priceCents: number;
+  currency: string;
+  category: string | null;
+  instructor: { id: string; name: string; email: string };
+  enrollmentCount: number;
+  ratingAvg: number;
+  reviewCount: number;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LmsCourseListResponse {
+  data: LmsCourse[];
+  meta: { page: number; pageSize: number; total: number; totalPages: number };
+}
+
+export async function listLmsCourses(query: {
+  search?: string;
+  status?: string;
+  page?: number;
+  pageSize?: number;
+} = {}): Promise<LmsCourseListResponse> {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    if (value !== undefined && value !== '') params.set(key, String(value));
+  }
+  const qs = params.toString();
+  return newApiFetch<LmsCourseListResponse>(`/admin/courses${qs ? `?${qs}` : ''}`);
+}
+
+export async function getLmsCourse(id: string) {
+  return newApiFetch(`/admin/courses/${id}`);
 }

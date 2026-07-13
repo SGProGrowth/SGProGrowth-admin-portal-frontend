@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { createUser, deleteUser, listUsers, updateUser } from '../db.js';
 import { requireAdmin } from '../middleware/admin.js';
 import { requireAuth } from '../middleware/auth.js';
+import { getSettings, validatePassword } from '../services/settings-config.js';
 
 const router = Router();
 
@@ -19,6 +20,22 @@ router.post('/', async (req, res) => {
 
   if (!email || !name || !password) {
     res.status(400).json({ error: 'Email, name and password are required' });
+    return;
+  }
+
+  const settings = getSettings();
+  if (role === 'instructor' && !settings.roles.allowInstructorSelfSignup) {
+    res.status(403).json({ error: 'Instructor self-signup is disabled in portal settings' });
+    return;
+  }
+  if (role === 'student' && !settings.roles.openStudentRegistration) {
+    res.status(403).json({ error: 'Open student registration is disabled in portal settings' });
+    return;
+  }
+
+  const pwdError = validatePassword(password, settings.security.forceStrongPasswords);
+  if (pwdError) {
+    res.status(400).json({ error: pwdError });
     return;
   }
 
@@ -41,6 +58,15 @@ router.patch('/:id', async (req, res) => {
   if (req.body?.name) patch.name = String(req.body.name);
   if (req.body?.role) patch.role = String(req.body.role);
   if (req.body?.password) patch.password = String(req.body.password);
+
+  if (patch.password) {
+    const settings = getSettings();
+    const pwdError = validatePassword(patch.password, settings.security.forceStrongPasswords);
+    if (pwdError) {
+      res.status(400).json({ error: pwdError });
+      return;
+    }
+  }
 
   const updated = await updateUser(id, patch);
   if (!updated) {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Area,
   AreaChart,
@@ -57,6 +57,7 @@ import { clearAvatar, getUser, initials, setAvatar, useAvatar, useToken } from '
 import { useActivities, useMessages } from '../lib/feed';
 import { Icon } from '../lib/icons';
 import { useToast } from '../lib/toast';
+import { getNotificationPreference, useSettings, writeStoredBoolean } from '../lib/settings';
 import { useStore } from '../store';
 
 const CHART_COLORS = ['#1a4d3e', '#248f6f', '#34d399', '#f59e0b', '#6ee7b7', '#164033', '#a7f3d0'];
@@ -68,7 +69,10 @@ export function Activity() {
       <PageHeader title="Activity" subtitle="Everything happening across the platform" />
       <PageCard>
         <div className="space-y-3">
-          {[...items, ...items].map((a, i) => (
+          {items.length === 0 ? (
+            <div className="py-12 text-center text-sm text-slate-400">No activity yet — sync from WordPress or create records to see updates here.</div>
+          ) : (
+          items.map((a, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, x: -10 }}
@@ -85,7 +89,8 @@ export function Activity() {
               </div>
               <span className="text-xs text-slate-400">{a.time}</span>
             </motion.div>
-          ))}
+          ))
+          )}
         </div>
       </PageCard>
     </div>
@@ -401,7 +406,7 @@ function prettyDay(k: string): string {
   return `${MONTHS[m - 1]} ${d}, ${y}`;
 }
 
-function ComposeModal({ onClose }: { onClose: () => void }) {
+function ComposeModal({ onClose, onSent }: { onClose: () => void; onSent?: () => void }) {
   const toast = useToast();
   const [to, setTo] = useState('');
   const [subject, setSubject] = useState('');
@@ -414,7 +419,7 @@ function ComposeModal({ onClose }: { onClose: () => void }) {
     setBusy(true);
     try {
       const res = await composeMail({ to: to.trim(), subject: subject.trim(), body });
-      if (res.ok) { toast('Email sent successfully!', 'success'); onClose(); }
+      if (res.ok) { toast('Email sent successfully!', 'success'); onSent?.(); onClose(); }
       else toast(res.message ?? 'Failed to send email', 'error');
     } catch { toast('Could not send — check SMTP settings', 'error'); }
     finally { setBusy(false); }
@@ -460,13 +465,12 @@ function ComposeModal({ onClose }: { onClose: () => void }) {
 }
 
 export function Messages() {
-  const toast = useToast();
-  const { items, markRead } = useMessages();
+  const { items, markRead, reload } = useMessages();
   const [composing, setComposing] = useState(false);
 
   return (
     <div>
-      {composing && <ComposeModal onClose={() => setComposing(false)} />}
+      {composing && <ComposeModal onClose={() => setComposing(false)} onSent={() => void reload()} />}
       <PageHeader
         title="Messages"
         subtitle="Your inbox — send real emails via your configured SMTP"
@@ -785,7 +789,9 @@ const SETTINGS_TABS = [
 export function Settings() {
   const store = useStore();
   const toast = useToast();
+  const { settings, saveSection } = useSettings();
   const [tab, setTab] = useState(() => sessionStorage.getItem('sg_settings_tab') ?? 'general');
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const saved = sessionStorage.getItem('sg_settings_tab');
@@ -795,12 +801,43 @@ export function Settings() {
     }
   }, []);
 
+  const saveCurrentTab = async () => {
+    setSaving(true);
+    try {
+      if (tab === 'general' || tab === 'branding' || tab === 'localization') {
+        window.dispatchEvent(new CustomEvent('sgpro-save-settings-tab', { detail: tab }));
+        toast('Settings saved', 'success');
+        return;
+      }
+      const sectionMap: Record<string, keyof typeof settings> = {
+        roles: 'roles',
+        security: 'security',
+        notifications: 'notifications',
+      };
+      const section = sectionMap[tab];
+      if (section) {
+        await saveSection(section, settings[section]);
+        toast('Settings saved', 'success');
+      } else {
+        toast('Use the panel save button for this tab', 'info');
+      }
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Save failed', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div>
       <PageHeader
         title="Settings"
         subtitle="Portal configuration"
-        actions={<Button icon="check" onClick={() => toast('Settings saved', 'success')}>Save changes</Button>}
+        actions={
+          <Button icon="check" disabled={saving} onClick={() => void saveCurrentTab()}>
+            {saving ? 'Saving…' : 'Save changes'}
+          </Button>
+        }
       />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[220px_1fr]">
         <SideTabs tabs={SETTINGS_TABS} active={tab} onChange={setTab} />
@@ -825,8 +862,8 @@ export function Settings() {
                 <RoleAccessRow role="Subscriber" desc="Browse catalog & receive updates" tone="bg-slate-100 text-slate-600" />
               </div>
               <div className="mt-4 divide-y divide-slate-100">
-                <ToggleRow label="Allow instructor self-signup" desc="New instructors require approval" defaultOn={false} />
-                <ToggleRow label="Open student registration" desc="Anyone can create a student account" defaultOn />
+                <ToggleRow label="Allow instructor self-signup" desc="New instructors require approval" settingsPath="roles.allowInstructorSelfSignup" defaultOn={false} />
+                <ToggleRow label="Open student registration" desc="Anyone can create a student account" settingsPath="roles.openStudentRegistration" defaultOn />
               </div>
             </PageCard>
           )}
@@ -835,11 +872,11 @@ export function Settings() {
             <PageCard>
               <SectionTitle icon="bell" title="Notifications" desc="Choose what the portal alerts you about" />
               <div className="divide-y divide-slate-100">
-                <ToggleRow label="New enrollment alerts" desc="Email me when a student enrolls" defaultOn storageKey="notif_enroll" />
-                <ToggleRow label="Course completion" desc="Notify on each completion" defaultOn storageKey="notif_complete" />
-                <ToggleRow label="New reviews" desc="Alert when a review is posted" defaultOn storageKey="notif_reviews" />
-                <ToggleRow label="Weekly summary" desc="Digest every Monday" defaultOn={false} storageKey="notif_weekly" />
-                <ToggleRow label="Payment receipts" desc="Email on every order" defaultOn storageKey="notif_payments" />
+                <ToggleRow label="New enrollment alerts" desc="Email me when a student enrolls" defaultOn storageKey="notif_enroll" settingsPath="notifications.enroll" />
+                <ToggleRow label="Course completion" desc="Notify on each completion" defaultOn storageKey="notif_complete" settingsPath="notifications.complete" />
+                <ToggleRow label="New reviews" desc="Alert when a review is posted" defaultOn storageKey="notif_reviews" settingsPath="notifications.reviews" />
+                <ToggleRow label="Weekly summary" desc="Digest every Monday" defaultOn={false} storageKey="notif_weekly" settingsPath="notifications.weekly" />
+                <ToggleRow label="Payment receipts" desc="Email on every order" defaultOn storageKey="notif_payments" settingsPath="notifications.payments" />
               </div>
             </PageCard>
           )}
@@ -868,14 +905,16 @@ export function Settings() {
             <PageCard>
               <SectionTitle icon="shield" title="Security" desc="Protect admin access" />
               <div className="divide-y divide-slate-100">
-                <ToggleRow label="Two-factor authentication" desc="Require 2FA for all admins" defaultOn />
-                <ToggleRow label="Force strong passwords" desc="Min 10 chars, mixed case" defaultOn />
-                <ToggleRow label="Auto sign-out" desc="After 30 min of inactivity" defaultOn={false} />
+                <ToggleRow label="Two-factor authentication" desc="Require 2FA for all admins at login — each admin must also enable 2FA in Profile → Security" settingsPath="security.require2faForAdmins" defaultOn={false} />
+                <ToggleRow label="Force strong passwords" desc="Min 10 chars, mixed case" settingsPath="security.forceStrongPasswords" defaultOn />
+                <ToggleRow label="Auto sign-out" desc="After 30 min of inactivity" settingsPath="security.autoSignOut" defaultOn={false} />
               </div>
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Field label="Session timeout (min)" value="30" />
-                <Field label="Allowed login IPs" value="Any" />
+                <SessionTimeoutField />
               </div>
+              <p className="mt-3 text-xs text-slate-400">
+                Note: "Require 2FA" is a global policy. Each admin must individually set up 2FA in their own Profile → Security before this policy takes effect for them.
+              </p>
             </PageCard>
           )}
 
@@ -1286,9 +1325,9 @@ function ProfileNotificationsPanel() {
     <PageCard>
       <SectionTitle icon="bell" title="Notification preferences" desc="How we reach you" />
       <div className="divide-y divide-slate-100">
-        <ToggleRow label="Product updates" desc="New features & tips" defaultOn storageKey="pnotif_updates" />
-        <ToggleRow label="Student messages" desc="Email me on new messages" defaultOn storageKey="pnotif_messages" />
-        <ToggleRow label="Marketing" desc="Occasional promotions" defaultOn={false} storageKey="pnotif_marketing" />
+        <ToggleRow label="Product updates" desc="New features & tips" defaultOn storageKey="pnotif_updates" settingsPath="profileNotifications.updates" />
+        <ToggleRow label="Student messages" desc="Email me on new messages" defaultOn storageKey="pnotif_messages" settingsPath="profileNotifications.messages" />
+        <ToggleRow label="Marketing" desc="Occasional promotions" defaultOn={false} storageKey="pnotif_marketing" settingsPath="profileNotifications.marketing" />
       </div>
     </PageCard>
   );
@@ -1330,23 +1369,46 @@ function SocialLinksPanel({ toast }: { toast: ReturnType<typeof useToast> }) {
 // ── Settings: General ─────────────────────────────────────────────────────────
 
 function GeneralSettingsPanel({ toast }: { toast: ReturnType<typeof useToast> }) {
+  const { settings, saveSection } = useSettings();
   const inp = 'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100';
-  const [siteTitle, setSiteTitle] = useState(() => lsGet('gen_siteTitle', 'SG Pro Growth'));
-  const [tagline, setTagline] = useState(() => lsGet('gen_tagline', 'Training minds. Transforming businesses.'));
-  const [supportEmail, setSupportEmail] = useState(() => lsGet('gen_supportEmail', 'contact@sgprogrowth.com'));
-  const [supportPhone, setSupportPhone] = useState(() => lsGet('gen_supportPhone', '+91 98765 43210'));
-  const [adminEmail, setAdminEmail] = useState(() => lsGet('gen_adminEmail', 'maheshmd@sharvagroup.com'));
-  const [siteUrl, setSiteUrl] = useState(() => lsGet('gen_siteUrl', 'https://sharvaconsulting.com'));
-  const [description, setDescription] = useState(() => lsGet('gen_desc', 'SGProGrowth gives you personally synergised career guidance before you enrol in any training — so you learn with purpose and grow with confidence.'));
-  const [copyright, setCopyright] = useState(() => lsGet('gen_copyright', '© sharvagroup. All rights reserved.'));
+  const [siteTitle, setSiteTitle] = useState(settings.general.siteTitle);
+  const [tagline, setTagline] = useState(settings.general.tagline);
+  const [supportEmail, setSupportEmail] = useState(settings.general.supportEmail);
+  const [supportPhone, setSupportPhone] = useState(settings.general.supportPhone);
+  const [adminEmail, setAdminEmail] = useState(settings.general.adminEmail);
+  const [siteUrl, setSiteUrl] = useState(settings.general.siteUrl);
+  const [description, setDescription] = useState(settings.general.description);
+  const [copyright, setCopyright] = useState(settings.general.copyright);
 
-  const save = () => {
-    lsSet('gen_siteTitle', siteTitle); lsSet('gen_tagline', tagline);
-    lsSet('gen_supportEmail', supportEmail); lsSet('gen_supportPhone', supportPhone);
-    lsSet('gen_adminEmail', adminEmail); lsSet('gen_siteUrl', siteUrl);
-    lsSet('gen_desc', description); lsSet('gen_copyright', copyright);
-    toast('General settings saved', 'success');
+  useEffect(() => {
+    setSiteTitle(settings.general.siteTitle);
+    setTagline(settings.general.tagline);
+    setSupportEmail(settings.general.supportEmail);
+    setSupportPhone(settings.general.supportPhone);
+    setAdminEmail(settings.general.adminEmail);
+    setSiteUrl(settings.general.siteUrl);
+    setDescription(settings.general.description);
+    setCopyright(settings.general.copyright);
+  }, [settings.general]);
+
+  const save = async () => {
+    try {
+      await saveSection('general', {
+        siteTitle, tagline, supportEmail, supportPhone, adminEmail, siteUrl, description, copyright,
+      });
+      toast('General settings saved', 'success');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Save failed', 'error');
+    }
   };
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent<string>).detail === 'general') void save();
+    };
+    window.addEventListener('sgpro-save-settings-tab', handler);
+    return () => window.removeEventListener('sgpro-save-settings-tab', handler);
+  }, [siteTitle, tagline, supportEmail, supportPhone, adminEmail, siteUrl, description, copyright]);
 
   return (
     <PageCard>
@@ -1397,16 +1459,25 @@ function GeneralSettingsPanel({ toast }: { toast: ReturnType<typeof useToast> })
 const SGPG_LOGO = 'https://sharvaconsulting.com/wp-content/uploads/2025/08/cropped-1000325607-1.jpeg';
 
 function BrandingPanel({ toast }: { toast: ReturnType<typeof useToast> }) {
+  const { settings, saveSection } = useSettings();
   const inp = 'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100';
-  const [primary, setPrimary] = useState(() => lsGet('brand_primary', '#1a4d3e'));
-  const [accent, setAccent] = useState(() => lsGet('brand_accent', '#248f6f'));
-  const [logo, setLogo] = useState(() => lsGet('brand_logo', SGPG_LOGO));
-  const [siteName, setSiteName] = useState(() => lsGet('brand_name', 'SG Pro Growth'));
-  const [tagline, setTagline] = useState(() => lsGet('brand_tagline', 'Training minds. Transforming businesses.'));
+  const [primary, setPrimary] = useState(settings.branding.primary);
+  const [accent, setAccent] = useState(settings.branding.accent);
+  const [logo, setLogo] = useState(settings.branding.logo);
+  const [siteName, setSiteName] = useState(settings.branding.siteName);
+  const [tagline, setTagline] = useState(settings.branding.tagline);
+  const [certTemplate, setCertTemplate] = useState(settings.branding.certTemplate);
+  const [certTemplateName, setCertTemplateName] = useState(settings.branding.certTemplateName);
 
-  // Certificate template
-  const [certTemplate, setCertTemplate] = useState<string>(() => lsGet('cert_template', ''));
-  const [certTemplateName, setCertTemplateName] = useState<string>(() => lsGet('cert_template_name', ''));
+  useEffect(() => {
+    setPrimary(settings.branding.primary);
+    setAccent(settings.branding.accent);
+    setLogo(settings.branding.logo);
+    setSiteName(settings.branding.siteName);
+    setTagline(settings.branding.tagline);
+    setCertTemplate(settings.branding.certTemplate);
+    setCertTemplateName(settings.branding.certTemplateName);
+  }, [settings.branding]);
 
   const handleLogoFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1432,16 +1503,26 @@ function BrandingPanel({ toast }: { toast: ReturnType<typeof useToast> }) {
     reader.readAsDataURL(file);
   };
 
-  const save = () => {
-    lsSet('brand_primary', primary); lsSet('brand_accent', accent);
-    lsSet('brand_logo', logo); lsSet('brand_name', siteName);
-    lsSet('brand_tagline', tagline);
-    if (certTemplate) { lsSet('cert_template', certTemplate); lsSet('cert_template_name', certTemplateName); }
-    document.documentElement.style.setProperty('--color-brand-600', primary);
-    document.documentElement.style.setProperty('--color-brand-700', accent);
-    window.dispatchEvent(new Event('storage'));
-    toast('Branding saved and applied', 'success');
+  const save = async () => {
+    try {
+      await saveSection('branding', {
+        primary, accent, logo, siteName, tagline,
+        certTemplate: certTemplate || settings.branding.certTemplate,
+        certTemplateName: certTemplateName || settings.branding.certTemplateName,
+      });
+      toast('Branding saved and applied', 'success');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Save failed', 'error');
+    }
   };
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent<string>).detail === 'branding') void save();
+    };
+    window.addEventListener('sgpro-save-settings-tab', handler);
+    return () => window.removeEventListener('sgpro-save-settings-tab', handler);
+  }, [primary, accent, logo, siteName, tagline, certTemplate, certTemplateName]);
 
   return (
     <>
@@ -1518,7 +1599,7 @@ function BrandingPanel({ toast }: { toast: ReturnType<typeof useToast> }) {
               <div className="flex items-center justify-between border-t border-brand-100 bg-white px-4 py-2">
                 <span className="text-xs font-semibold text-slate-600">{certTemplateName || 'Certificate template'}</span>
                 <button
-                  onClick={() => { setCertTemplate(''); setCertTemplateName(''); lsSet('cert_template', ''); lsSet('cert_template_name', ''); toast('Template removed', 'info'); }}
+                  onClick={() => { setCertTemplate(''); setCertTemplateName(''); toast('Template removed — save branding to persist', 'info'); }}
                   className="text-xs font-semibold text-rose-500 hover:text-rose-700"
                 >
                   Remove
@@ -1545,7 +1626,7 @@ function BrandingPanel({ toast }: { toast: ReturnType<typeof useToast> }) {
               <input type="file" accept="image/png,image/jpeg,application/pdf" className="hidden" onChange={handleCertTemplate} />
             </label>
           )}
-          <p className="text-xs text-slate-400">The template is stored locally and used when generating certificate PDFs. Recommended size: A4 landscape (2480 × 1754 px).</p>
+          <p className="text-xs text-slate-400">The template is saved to portal settings and used when generating certificate PDFs. Recommended size: A4 landscape (2480 × 1754 px).</p>
         </div>
       </PageCard>
     </>
@@ -1555,17 +1636,36 @@ function BrandingPanel({ toast }: { toast: ReturnType<typeof useToast> }) {
 // ── Settings: Localization ────────────────────────────────────────────────────
 
 function LocalizationPanel({ toast }: { toast: ReturnType<typeof useToast> }) {
+  const { settings, saveSection } = useSettings();
   const inp = 'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100';
-  const [currency, setCurrency] = useState(() => lsGet('loc_currency', 'INR (₹)'));
-  const [lang, setLang] = useState(() => lsGet('loc_lang', 'English (India)'));
-  const [tz, setTz] = useState(() => lsGet('loc_tz', 'Asia/Kolkata (GMT+5:30)'));
-  const [fmt, setFmt] = useState(() => lsGet('loc_fmt', 'DD/MM/YYYY'));
+  const [currency, setCurrency] = useState(settings.localization.currency);
+  const [lang, setLang] = useState(settings.localization.language);
+  const [tz, setTz] = useState(settings.localization.timezone);
+  const [fmt, setFmt] = useState(settings.localization.dateFormat);
 
-  const save = () => {
-    lsSet('loc_currency', currency); lsSet('loc_lang', lang);
-    lsSet('loc_tz', tz); lsSet('loc_fmt', fmt);
-    toast('Localization settings saved', 'success');
+  useEffect(() => {
+    setCurrency(settings.localization.currency);
+    setLang(settings.localization.language);
+    setTz(settings.localization.timezone);
+    setFmt(settings.localization.dateFormat);
+  }, [settings.localization]);
+
+  const save = async () => {
+    try {
+      await saveSection('localization', { currency, language: lang, timezone: tz, dateFormat: fmt });
+      toast('Localization settings saved', 'success');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Save failed', 'error');
+    }
   };
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent<string>).detail === 'localization') void save();
+    };
+    window.addEventListener('sgpro-save-settings-tab', handler);
+    return () => window.removeEventListener('sgpro-save-settings-tab', handler);
+  }, [currency, lang, tz, fmt]);
 
   return (
     <PageCard>
@@ -1606,7 +1706,9 @@ function LocalizationPanel({ toast }: { toast: ReturnType<typeof useToast> }) {
 // ── Security Panel (password change + real TOTP 2FA) ─────────────────────────
 
 function SecurityPanel({ toast }: { toast: ReturnType<typeof useToast> }) {
+  const { settings } = useSettings();
   const input = 'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100';
+  const minLen = settings.security.forceStrongPasswords ? 10 : 8;
 
   // ── Password change ──────────────────────────────────────────────────────
   const [curPwd, setCurPwd] = useState('');
@@ -1617,7 +1719,11 @@ function SecurityPanel({ toast }: { toast: ReturnType<typeof useToast> }) {
   const savePassword = async () => {
     if (!curPwd || !newPwd) { toast('Fill in all password fields', 'error'); return; }
     if (newPwd !== confPwd) { toast('New passwords do not match', 'error'); return; }
-    if (newPwd.length < 8) { toast('Password must be at least 8 characters', 'error'); return; }
+    if (newPwd.length < minLen) { toast(`Password must be at least ${minLen} characters`, 'error'); return; }
+    if (settings.security.forceStrongPasswords && (!/[a-z]/.test(newPwd) || !/[A-Z]/.test(newPwd))) {
+      toast('Password must include uppercase and lowercase letters', 'error');
+      return;
+    }
     setPwdBusy(true);
     try {
       const r = await changePassword({ currentPassword: curPwd, newPassword: newPwd });
@@ -1711,6 +1817,15 @@ function SecurityPanel({ toast }: { toast: ReturnType<typeof useToast> }) {
             </span>
           )}
         </div>
+
+        {settings.security.require2faForAdmins && twoEnabled === false && (
+          <div className="mt-3 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <Icon name="alert-circle" size={16} className="mt-0.5 shrink-0 text-amber-500" />
+            <div>
+              <strong>Action required:</strong> The global security policy requires all admins to have 2FA enabled. You must set up 2FA on this account before logging out, otherwise you will be locked out.
+            </div>
+          </div>
+        )}
 
         {twoEnabled === false && setupStep === 'idle' && (
           <div className="mt-4">
@@ -2445,16 +2560,78 @@ function MiniStat({ value, label }: { value: string; label: string }) {
   );
 }
 
-function ToggleRow({ label, desc, defaultOn, storageKey }: { label: string; desc: string; defaultOn: boolean; storageKey?: string }) {
-  const [on, setOn] = useState(() => {
-    if (!storageKey) return defaultOn;
-    const v = localStorage.getItem(storageKey);
-    return v !== null ? v === 'true' : defaultOn;
-  });
+function SessionTimeoutField() {
+  const { settings, saveSection } = useSettings();
+  const inp = 'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100';
+  const [minutes, setMinutes] = useState(String(settings.security.sessionTimeoutMinutes));
+
+  useEffect(() => {
+    setMinutes(String(settings.security.sessionTimeoutMinutes));
+  }, [settings.security.sessionTimeoutMinutes]);
+
+  const saveMinutes = () => {
+    const value = Math.max(5, Math.min(480, Number(minutes) || 30));
+    void saveSection('security', { ...settings.security, sessionTimeoutMinutes: value });
+    setMinutes(String(value));
+  };
+
+  return (
+    <div>
+      <label className="mb-1.5 block text-xs font-semibold text-slate-500">Session timeout (minutes)</label>
+      <div className="flex gap-2">
+        <input
+          type="number"
+          min={5}
+          max={480}
+          value={minutes}
+          onChange={(e) => setMinutes(e.target.value)}
+          onBlur={saveMinutes}
+          className={inp}
+        />
+      </div>
+      <p className="mt-1 text-xs text-slate-400">Used when auto sign-out is enabled.</p>
+    </div>
+  );
+}
+
+function ToggleRow({
+  label,
+  desc,
+  defaultOn,
+  storageKey,
+  settingsPath,
+}: {
+  label: string;
+  desc: string;
+  defaultOn: boolean;
+  storageKey?: string;
+  settingsPath?: string;
+}) {
+  const { settings, saveSection } = useSettings();
+  const readValue = () => {
+    if (settingsPath) {
+      const [section, key] = settingsPath.split('.') as [keyof typeof settings, string];
+      const val = (settings[section] as Record<string, boolean>)[key];
+      if (typeof val === 'boolean') return val;
+    }
+    if (storageKey) return getNotificationPreference(storageKey, defaultOn);
+    return defaultOn;
+  };
+  const [on, setOn] = useState(readValue);
+
+  useEffect(() => {
+    setOn(readValue());
+  }, [settings]);
+
   const toggle = () => {
     const next = !on;
     setOn(next);
-    if (storageKey) localStorage.setItem(storageKey, String(next));
+    if (storageKey) writeStoredBoolean(storageKey, next);
+    if (settingsPath) {
+      const [section, key] = settingsPath.split('.') as [keyof typeof settings, string];
+      const current = settings[section] as Record<string, boolean>;
+      void saveSection(section, { ...current, [key]: next } as typeof settings[typeof section]);
+    }
   };
   return (
     <div className="flex items-center justify-between py-3">

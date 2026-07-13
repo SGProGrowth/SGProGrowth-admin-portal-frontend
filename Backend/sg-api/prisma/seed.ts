@@ -12,7 +12,7 @@ interface SeedFile {
   entities: Record<string, Record<string, string | number>[]>;
   activities: { user: string; action: string; time: string }[];
   messages: { from: string; preview: string; time: string; unread: boolean }[];
-  users: { email: string; name: string; role: string; password: string }[];
+  users: { email: string; name: string; role: string }[];
 }
 
 async function main() {
@@ -46,18 +46,24 @@ async function main() {
   }
 
   for (const u of seed.users) {
+    const seedPassword = process.env.ADMIN_SEED_PASSWORD;
+    if (!seedPassword) {
+      throw new Error(
+        `ADMIN_SEED_PASSWORD env var is not set. Set it before seeding (e.g. in .env) — required to seed user "${u.email}".`,
+      );
+    }
     await prisma.user.upsert({
       where: { email: u.email.toLowerCase() },
       create: {
         email: u.email.toLowerCase(),
         name: u.name,
         role: u.role,
-        passwordHash: bcrypt.hashSync(u.password, 10),
+        passwordHash: bcrypt.hashSync(seedPassword, 10),
       },
       update: {
         name: u.name,
         role: u.role,
-        passwordHash: bcrypt.hashSync(u.password, 10),
+        passwordHash: bcrypt.hashSync(seedPassword, 10),
       },
     });
   }

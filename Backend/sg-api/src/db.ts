@@ -53,5 +53,9 @@ export const update2fa = (id: number, patch: Parameters<StorageAdapter['update2f
   store.update2fa(id, patch);
 export const deleteUser = (id: number) => store.deleteUser(id);
 export const getActivities = () => store.getActivities();
+export const appendActivity = (item: Parameters<StorageAdapter['appendActivity']>[0]) =>
+  store.appendActivity(item);
 export const getMessages = () => store.getMessages();
+export const appendMessage = (item: Parameters<StorageAdapter['appendMessage']>[0]) =>
+  store.appendMessage(item);
 export const markMessageRead = (id: number) => store.markMessageRead(id);

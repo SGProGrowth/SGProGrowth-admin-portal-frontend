@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { nav } from '../data';
 import { getUser, logout, useAvatar } from '../lib/auth';
+import { useMessages } from '../lib/feed';
 import { Icon } from '../lib/icons';
+import { useSettings } from '../lib/settings';
 import { Avatar } from './ui';
 
 const REAL_LOGO = 'https://sharvaconsulting.com/wp-content/uploads/2025/08/cropped-1000325607-1.jpeg';
@@ -39,6 +41,9 @@ function SiteLogo() {
 export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const user = getUser();
   const avatar = useAvatar();
+  const { unreadCount } = useMessages();
+  const { settings } = useSettings();
+  const notificationsEnabled = settings.profileNotifications.messages;
 
   return (
     <>
@@ -82,7 +87,16 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
                       )}
                       <Icon name={item.icon} size={16} />
                       <span className="flex-1">{item.label}</span>
-                      {item.badge && (
+                      {(item.id === 'messages' && notificationsEnabled && unreadCount > 0) && (
+                        <span
+                          className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase ${
+                            isActive ? 'bg-white/20 text-white' : 'bg-brand-100 text-brand-700'
+                          }`}
+                        >
+                          {String(unreadCount)}
+                        </span>
+                      )}
+                      {item.id !== 'messages' && item.badge && (
                         <span
                           className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase ${
                             isActive ? 'bg-white/20 text-white' : 'bg-brand-100 text-brand-700'

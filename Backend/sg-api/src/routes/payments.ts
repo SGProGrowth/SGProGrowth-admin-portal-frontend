@@ -2,6 +2,7 @@ import { createHmac, randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import { requireAdmin } from '../middleware/admin.js';
 import { requireAuth } from '../middleware/auth.js';
+import { notifyAdminIfEnabled } from '../services/notifications.js';
 
 const router = Router();
 router.use(requireAuth, requireAdmin);
@@ -95,6 +96,13 @@ router.post('/verify', (req, res) => {
     .digest('hex');
 
   const valid = expected === razorpay_signature;
+  if (valid) {
+    void notifyAdminIfEnabled(
+      'payment',
+      'Payment received',
+      `Payment ${razorpay_payment_id} verified for order ${razorpay_order_id}.`,
+    );
+  }
   res.json({
     ok: valid,
     message: valid ? `Payment ${razorpay_payment_id} verified successfully` : 'Payment signature mismatch',

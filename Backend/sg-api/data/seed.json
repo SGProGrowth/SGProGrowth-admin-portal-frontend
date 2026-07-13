@@ -54,24 +54,13 @@
       { "id": 6, "title": "Color Therapy Introduction", "host": "Vartika Mehta", "date": "2026-08-09 02:00 PM", "type": "Webinar", "description": "Introduction to color therapy principles with Vartika Mehta" }
     ]
   },
-  "activities": [
-    { "user": "Neha Sharma", "action": "completed Unit 2 in IT Project Management", "time": "2 hours ago" },
-    { "user": "Riya Patel", "action": "submitted assignment in Excel Advanced", "time": "5 hours ago" },
-    { "user": "Ankit Verma", "action": "enrolled in Power BI Masterclass", "time": "1 day ago" },
-    { "user": "Shah Kanchi", "action": "published a new quiz in Excel Advanced", "time": "1 day ago" },
-    { "user": "Kanchi S", "action": "posted a question in Q&A Discussions", "time": "2 days ago" }
-  ],
-  "messages": [
-    { "from": "Kanchi Shah", "preview": "Great progress on your assignment!", "time": "10:30 AM", "unread": true },
-    { "from": "Course Support", "preview": "Your quiz results are ready", "time": "Yesterday", "unread": true },
-    { "from": "Neha Sharma", "preview": "Thank you for the feedback", "time": "2 days ago", "unread": false }
-  ],
+  "activities": [],
+  "messages": [],
   "users": [
     {
       "email": "maheshmd@sharvagroup.com",
       "name": "Mahesh MD",
-      "role": "admin",
-      "password": "Growth$108@1610"
+      "role": "admin"
     }
   ]
 }

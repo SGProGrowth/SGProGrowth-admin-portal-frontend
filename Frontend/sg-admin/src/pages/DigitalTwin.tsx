@@ -1,7 +1,7 @@
 import { Html, OrbitControls } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { motion } from 'framer-motion';
-import { Suspense, useMemo, useRef, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Area,
   AreaChart,
@@ -23,27 +23,18 @@ import type { Group } from 'three';
 import { PageHeader } from '../components/PageHeader';
 import { PageCard } from '../components/ui';
 import { Icon } from '../lib/icons';
+import { useStore } from '../store';
+import type { EntityRecord } from '../types';
 import {
   contributions,
   DEFAULT_TWIN,
   gradeLetter,
   predictGrade,
   projectWeeks,
-  REAL_INSTRUCTORS,
-  REAL_STUDENTS,
   recommendations,
   riskLevel,
   type TwinInputs,
 } from '../lib/insights';
-
-/** Merged real names — real students first, then instructors, then extras */
-const SEAT_NAMES = [
-  ...REAL_STUDENTS.filter((n) => !n.includes('@')),
-  ...REAL_INSTRUCTORS,
-  'Neha Sharma', 'Riya Patel', 'Ankit Verma', 'Arjun Mehta', 'Priya Nair',
-  'Rohan Gupta', 'Sneha Reddy', 'Vikram Singh', 'Aditi Rao', 'Karan Malhotra',
-  'Pooja Iyer', 'Sahil Khan', 'Divya Menon', 'Manish Joshi',
-];
 
 /* Map a 0–100 grade to a colour for the 3D seats + charts. */
 function gradeColor(score: number): string {
@@ -65,22 +56,26 @@ interface Seat {
 const SKIN_TONES = ['#f1c9a5', '#e0ac86', '#c68642', '#a56c43', '#8d5524', '#ffdbac'];
 const HAIR_TONES = ['#2b2b2b', '#1a1a1a', '#4b3621', '#6b4226', '#0f0f0f', '#5a3a22'];
 
-function buildSeats(inputs: TwinInputs): Seat[] {
+function buildSeats(inputs: TwinInputs, students: EntityRecord[]): Seat[] {
   const rows = 4;
   const cols = 6;
   const seats: Seat[] = [];
+  const namePool = students.length > 0
+    ? students.map((s) => String(s.name ?? 'Student')).filter((n) => n && !n.includes('@'))
+    : ['Student'];
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const i = r * cols + c;
-      // Each student deviates from the cohort inputs deterministically.
       const dev = Math.sin(i * 12.9898) * 0.5;
       const dev2 = Math.cos(i * 78.233) * 0.5;
+      const student = students[i];
+      const studentProgress = student ? Number(student.progress ?? inputs.priorGrade) : inputs.priorGrade;
       const grade = predictGrade({
         ...inputs,
         studyHours: Math.max(0, inputs.studyHours + dev * 8),
         practice: Math.max(0, inputs.practice + dev2 * 5),
         attendance: Math.max(0, Math.min(100, inputs.attendance + dev * 18)),
-        priorGrade: Math.max(0, Math.min(100, inputs.priorGrade + dev2 * 14)),
+        priorGrade: Math.max(0, Math.min(100, studentProgress + dev2 * 14)),
       });
       seats.push({
         key: `${r}-${c}`,
@@ -88,7 +83,7 @@ function buildSeats(inputs: TwinInputs): Seat[] {
         x: (c - (cols - 1) / 2) * 1.5,
         z: (r - (rows - 1) / 2) * 1.5 + 1.5,
         grade,
-        name: SEAT_NAMES[i % SEAT_NAMES.length],
+        name: namePool[i % namePool.length] ?? 'Student',
       });
     }
   }
@@ -184,8 +179,8 @@ function SeatMesh({ seat }: { seat: Seat }) {
   );
 }
 
-function Classroom({ inputs, avg }: { inputs: TwinInputs; avg: number }) {
-  const seats = useMemo(() => buildSeats(inputs), [inputs]);
+function Classroom({ inputs, avg, students }: { inputs: TwinInputs; avg: number; students: EntityRecord[] }) {
+  const seats = useMemo(() => buildSeats(inputs, students), [inputs, students]);
   const rig = useRef<Group>(null);
   useFrame((state) => {
     if (rig.current) {
@@ -240,6 +235,25 @@ function Classroom({ inputs, avg }: { inputs: TwinInputs; avg: number }) {
   );
 }
 
+function buildTwinFromStore(courses: EntityRecord[], students: EntityRecord[], instructors: EntityRecord[]): TwinInputs {
+  const courseCount = courses.length;
+  const enrollmentTotal = courses.reduce((sum, course) => sum + Number(course.students ?? 0), 0);
+  const completionAvg = courseCount > 0
+    ? Math.round(courses.reduce((sum, course) => sum + Number(course.completion ?? 0), 0) / courseCount)
+    : DEFAULT_TWIN.priorGrade;
+  const studentProgressAvg = students.length > 0
+    ? Math.round(students.reduce((sum, s) => sum + Number(s.progress ?? 0), 0) / students.length)
+    : completionAvg;
+
+  return {
+    studyHours: Math.min(40, Math.max(6, 8 + courseCount * 0.6 + enrollmentTotal / 40)),
+    practice: Math.min(20, Math.max(2, 3 + Math.round(studentProgressAvg / 12))),
+    attendance: Math.min(100, Math.max(55, 72 + instructors.length * 2 + (students.length > 10 ? 4 : 0))),
+    sleep: 7.2,
+    priorGrade: Math.min(100, Math.max(35, studentProgressAvg || completionAvg)),
+  };
+}
+
 function Slider({
   label,
   icon,
@@ -287,8 +301,20 @@ function Slider({
 }
 
 export function DigitalTwin() {
-  const [inputs, setInputs] = useState<TwinInputs>(DEFAULT_TWIN);
+  const store = useStore();
+  const students = store.list('students');
+  const instructors = store.list('instructors');
+  const courses = store.list('courses');
+  const [inputs, setInputs] = useState<TwinInputs>(() => buildTwinFromStore(courses, students, instructors));
   const set = (patch: Partial<TwinInputs>) => setInputs((p) => ({ ...p, ...patch }));
+
+  useEffect(() => {
+    const next = buildTwinFromStore(store.list('courses'), store.list('students'), store.list('instructors'));
+    setInputs((prev) => {
+      const same = prev.studyHours === next.studyHours && prev.practice === next.practice && prev.attendance === next.attendance && prev.sleep === next.sleep && prev.priorGrade === next.priorGrade;
+      return same ? prev : next;
+    });
+  }, [store]);
 
   const grade = predictGrade(inputs);
   const { letter, tone } = gradeLetter(grade);
@@ -347,7 +373,7 @@ export function DigitalTwin() {
                 <ambientLight intensity={0.7} />
                 <directionalLight position={[6, 10, 6]} intensity={1.1} castShadow />
                 <directionalLight position={[-6, 6, -4]} intensity={0.4} color="#6ee7b7" />
-                <Classroom inputs={inputs} avg={grade} />
+                <Classroom inputs={inputs} avg={grade} students={students} />
                 <OrbitControls
                   enablePan={false}
                   minDistance={7}

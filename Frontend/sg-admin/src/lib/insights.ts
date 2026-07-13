@@ -125,24 +125,6 @@ const CITIES: { city: string; lat: number; lng: number }[] = [
   { city: 'London', lat: 51.5074, lng: -0.1278 },
 ];
 
-/** Real students + instructors imported from sharvaconsulting.com via BuddyPress */
-export const REAL_STUDENTS = [
-  'mayuri powar', 'Vijay', 'Sonie Thakkar', 'Himannshu Jain', 'Jatan Atara',
-  'Bhasha World', 'Kanchi Shah', 'Shah Kanchi', 'maheshmd@sharvagroup.com',
-  'shweta yadav', 'mdeosthale@gmail.com',
-];
-
-export const REAL_INSTRUCTORS = [
-  'Kanchi shah', 'Ninad Subhashchandra Kulkarni', 'Vartika Mehta', 'TATA', 'AshishInstructor',
-];
-
-/** Combined real member names for the map — filter out pure email addresses */
-const NAMES = [...REAL_INSTRUCTORS, ...REAL_STUDENTS]
-  .filter((n) => !n.includes('@'))
-  .concat(['Neha Sharma', 'Riya Patel', 'Ankit Verma', 'Arjun Mehta', 'Priya Nair',
-           'Rohan Gupta', 'Sneha Reddy', 'Vikram Singh', 'Aditi Rao']);
-
-/** Real course titles from sharvaconsulting.com */
 const FIRST = [
   'Microsoft Excel Advanced Excel Formulas & Functions',
   'Power BI Masterclass - DAX, Excel And More',
@@ -152,27 +134,44 @@ const FIRST = [
   'BNI-Trainers and Coaches Power Team',
 ];
 
-/** Deterministic pseudo-random so markers don't jump every render. */
 function seeded(n: number) {
   const x = Math.sin(n * 99.7) * 10000;
   return x - Math.floor(x);
 }
 
-export function geoUsers(): GeoUser[] {
-  return NAMES.map((name, idx) => {
+/** Build geo markers from synced member records — no synthetic fallback names. */
+export function geoUsersFromMembers(
+  students: { name?: string }[],
+  instructors: { name?: string }[],
+): GeoUser[] {
+  const names: { name: string; role: 'student' | 'instructor' }[] = [];
+  for (const s of students) {
+    const name = String(s.name ?? '').trim();
+    if (name && !name.includes('@')) names.push({ name, role: 'student' });
+  }
+  for (const i of instructors) {
+    const name = String(i.name ?? '').trim();
+    if (name && !name.includes('@')) names.push({ name, role: 'instructor' });
+  }
+  return names.map((m, idx) => {
     const c = CITIES[idx % CITIES.length];
     const jitter = (seeded(idx) - 0.5) * 0.5;
     const jitter2 = (seeded(idx + 50) - 0.5) * 0.5;
     return {
       id: idx + 1,
-      name,
+      name: m.name,
       city: c.city,
       lat: c.lat + jitter,
       lng: c.lng + jitter2,
       active: seeded(idx + 7) > 0.45,
-      role: seeded(idx + 3) > 0.85 ? 'instructor' : 'student',
-      course: FIRST[idx % FIRST.length],
+      role: m.role,
+      course: FIRST[idx % FIRST.length] ?? 'Course',
       progress: Math.round(seeded(idx + 11) * 100),
     };
   });
+}
+
+/** @deprecated use geoUsersFromMembers with store/API data */
+export function geoUsers(): GeoUser[] {
+  return geoUsersFromMembers([], []);
 }

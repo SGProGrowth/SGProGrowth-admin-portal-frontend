@@ -5,3 +5,4 @@ dist/
 uploads/
 data/llm-config.json
 data/mail-config.json
+data/settings.json

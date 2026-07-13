@@ -25,7 +25,7 @@ function loadLocalDB(): DataMap {
   }
   const fresh: DataMap = {};
   Object.values(entityDefs).forEach((def) => {
-    fresh[def.key] = def.seed.map((r) => ({ ...r })) as EntityRecord[];
+    fresh[def.key] = [];
   });
   return fresh;
 }
@@ -56,7 +56,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       const data = await apiFetch<DataMap>('/entities');
       setDB(data);
     } catch {
-      /* keep local cache if API unavailable */
+      setDB((prev) => {
+        const empty: DataMap = {};
+        Object.values(entityDefs).forEach((def) => {
+          empty[def.key] = prev[def.key] ?? [];
+        });
+        return empty;
+      });
     } finally {
       setReady(true);
     }
@@ -69,7 +75,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const next = { ...prev };
         Object.values(entityDefs).forEach((def) => {
           if (!next[def.key]) {
-            next[def.key] = def.seed.map((r) => ({ ...r })) as EntityRecord[];
+            next[def.key] = [];
             changed = true;
           }
         });

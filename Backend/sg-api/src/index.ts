@@ -10,6 +10,7 @@ import assistantRouter from './routes/assistant.js';
 import entitiesRouter, { feedRouter } from './routes/entities.js';
 import mailRouter from './routes/mail.js';
 import paymentsRouter from './routes/payments.js';
+import settingsRouter from './routes/settings.js';
 import syncRouter from './routes/sync.js';
 import uploadsRouter from './routes/uploads.js';
 import usersRouter from './routes/users.js';
@@ -48,6 +49,7 @@ app.use('/api/users', usersRouter);
 app.use('/api/uploads', uploadsRouter);
 app.use('/api/mail', mailRouter);
 app.use('/api/payments', paymentsRouter);
+app.use('/api/settings', settingsRouter);
 app.use('/api/sync/wordpress', syncRouter);
 
 app.use((_req, res) => {

@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ENTITY_KEYS } from '../config.js';
 import { prisma, withRetry } from '../prisma.js';
 import type { ActivityItem, DataMap, EntityRecord, MessageItem } from '../types.js';
 import type { DbUser, StorageAdapter } from './types.js';
@@ -24,6 +25,12 @@ function asRecord(data: unknown): EntityRecord {
   return data as EntityRecord;
 }
 
+function emptyEntities(): DataMap {
+  const map: DataMap = {};
+  for (const key of ENTITY_KEYS) map[key] = [];
+  return map;
+}
+
 async function seedDatabase() {
   const seed = readSeed();
 
@@ -31,29 +38,6 @@ async function seedDatabase() {
     await tx.entityRecord.deleteMany();
     await tx.activity.deleteMany();
     await tx.message.deleteMany();
-
-    for (const [entity, records] of Object.entries(seed.entities)) {
-      for (const record of records) {
-        await tx.entityRecord.create({
-          data: { entity, recordId: record.id, data: record },
-        });
-      }
-    }
-
-    for (const a of seed.activities) {
-      await tx.activity.create({ data: a });
-    }
-
-    for (const m of seed.messages) {
-      await tx.message.create({
-        data: {
-          sender: m.from,
-          preview: m.preview,
-          time: m.time,
-          unread: m.unread,
-        },
-      });
-    }
 
     for (const u of seed.users) {
       await tx.user.upsert({
@@ -139,26 +123,12 @@ export const pgStore: StorageAdapter = {
   },
 
   async resetEntities() {
-    const seed = readSeed();
     await prisma.$transaction(async (tx) => {
       await tx.entityRecord.deleteMany();
       await tx.activity.deleteMany();
       await tx.message.deleteMany();
-      for (const [entity, records] of Object.entries(seed.entities)) {
-        for (const record of records) {
-          await tx.entityRecord.create({
-            data: { entity, recordId: record.id, data: record },
-          });
-        }
-      }
-      for (const a of seed.activities) await tx.activity.create({ data: a });
-      for (const m of seed.messages) {
-        await tx.message.create({
-          data: { sender: m.from, preview: m.preview, time: m.time, unread: m.unread },
-        });
-      }
     });
-    return pgStore.getAllEntities();
+    return emptyEntities();
   },
 
   async findUserById(id: number) {
@@ -243,7 +213,11 @@ export const pgStore: StorageAdapter = {
   },
 
   async getActivities() {
-    return prisma.activity.findMany({ orderBy: { id: 'asc' } });
+    return prisma.activity.findMany({ orderBy: { id: 'desc' } });
+  },
+
+  async appendActivity(item: ActivityItem) {
+    await prisma.activity.create({ data: item });
   },
 
   async getMessages() {
@@ -255,6 +229,24 @@ export const pgStore: StorageAdapter = {
       time: r.time,
       unread: r.unread,
     }));
+  },
+
+  async appendMessage(item: Omit<MessageItem, 'id'>) {
+    const row = await prisma.message.create({
+      data: {
+        sender: item.from,
+        preview: item.preview,
+        time: item.time,
+        unread: item.unread,
+      },
+    });
+    return {
+      id: row.id,
+      from: row.sender,
+      preview: row.preview,
+      time: row.time,
+      unread: row.unread,
+    };
   },
 
   async markMessageRead(id: number) {

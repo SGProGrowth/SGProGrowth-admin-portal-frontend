@@ -19,4 +19,6 @@ yarn-error.log*
 
 # OS files
 .DS_Store
-Thumbs.db
+Thumbs.dbsecrets.txt
+
+secrets.txt

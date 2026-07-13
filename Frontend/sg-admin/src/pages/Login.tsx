@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { verify2faLogin } from '../lib/admin-api';
 import { loginWithResult, saveSession } from '../lib/auth';
 import { Icon } from '../lib/icons';
+import type { AuthUser } from '../types';
 
 export function Login() {
   const navigate = useNavigate();
@@ -47,7 +48,11 @@ export function Login() {
     setError('');
     try {
       const res = await verify2faLogin({ tempToken, code });
-      saveSession(res.user, res.token);
+      const user: AuthUser = {
+        ...res.user,
+        role: res.user.role as AuthUser['role'],
+      };
+      saveSession(user, res.token);
       navigate('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid code — try again');
@@ -148,6 +153,9 @@ export function Login() {
                 </div>
 
                 {error && <p className="alert-warn px-3 py-2 text-sm font-medium">{error}</p>}
+                <p className="text-center text-xs text-gray-400">
+                  Code invalid? Sync your device clock (Settings → Time → Sync now), then try the latest code.
+                </p>
 
                 <motion.button
                   whileTap={{ scale: 0.98 }}

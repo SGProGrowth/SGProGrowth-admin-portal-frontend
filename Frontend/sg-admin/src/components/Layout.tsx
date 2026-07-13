@@ -1,8 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { nav } from '../data';
 import { getUser, logout, useAvatar } from '../lib/auth';
+import { useMessages } from '../lib/feed';
 import { Icon } from '../lib/icons';
+import { useSettings } from '../lib/settings';
+import { useStore } from '../store';
 import { Avatar } from './ui';
 import { Sidebar } from './Sidebar';
 
@@ -24,13 +28,96 @@ function BrandMark({ size = 'md' }: { size?: 'sm' | 'md' }) {
 export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [query, setQuery] = useState('');
+  const [showResults, setShowResults] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { unreadCount } = useMessages();
+  const store = useStore();
+  const { settings } = useSettings();
+
+  useEffect(() => {
+    if (!settings.security.autoSignOut) return;
+    const timeoutMs = Math.max(5, settings.security.sessionTimeoutMinutes) * 60 * 1000;
+    let timer = window.setTimeout(() => {
+      logout();
+      window.location.href = '/login';
+    }, timeoutMs);
+
+    const reset = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        logout();
+        window.location.href = '/login';
+      }, timeoutMs);
+    };
+
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'] as const;
+    events.forEach((ev) => window.addEventListener(ev, reset));
+    return () => {
+      window.clearTimeout(timer);
+      events.forEach((ev) => window.removeEventListener(ev, reset));
+    };
+  }, [settings.security.autoSignOut, settings.security.sessionTimeoutMinutes]);
 
   useEffect(() => {
     fetch('/api/health')
       .then((r) => (r.ok ? setApiStatus('online') : setApiStatus('offline')))
       .catch(() => setApiStatus('offline'));
   }, []);
+
+  const navItems = useMemo(
+    () =>
+      nav.flatMap((group) =>
+        group.items.map((item) => ({ label: item.label, path: `/${item.id}`, group: group.title, kind: 'nav' as const })),
+      ),
+    [],
+  );
+
+  const entityItems = useMemo(() => {
+    const items: { label: string; path: string; group: string; kind: 'entity' }[] = [];
+    const add = (entity: string, group: string, name: string, id: number) => {
+      items.push({ label: name, path: `/${entity}`, group: `${group} · #${id}`, kind: 'entity' });
+    };
+    for (const row of store.list('courses')) {
+      const title = String(row.title ?? '').trim();
+      if (title) add('courses', 'Courses', title, row.id);
+    }
+    for (const row of store.list('students')) {
+      const name = String(row.name ?? '').trim();
+      if (name) add('students', 'Students', name, row.id);
+    }
+    for (const row of store.list('instructors')) {
+      const name = String(row.name ?? '').trim();
+      if (name) add('instructors', 'Instructors', name, row.id);
+    }
+    for (const row of store.list('groups')) {
+      const name = String(row.name ?? row.title ?? '').trim();
+      if (name) add('groups', 'Groups', name, row.id);
+    }
+    return items;
+  }, [store]);
+
+  const searchPool = useMemo(() => [...entityItems, ...navItems], [entityItems, navItems]);
+
+  const matches = useMemo(() => {
+    const value = query.trim().toLowerCase();
+    if (!value) return [];
+    return searchPool
+      .filter(
+        (item) =>
+          item.label.toLowerCase().includes(value) ||
+          item.group.toLowerCase().includes(value) ||
+          item.path.includes(value),
+      )
+      .slice(0, 8);
+  }, [query, searchPool]);
+
+  const goToMatch = (path: string) => {
+    navigate(path);
+    setQuery('');
+    setShowResults(false);
+  };
 
   return (
     <div className="min-h-screen bg-[#f9fafb]">
@@ -49,12 +136,48 @@ export function Layout() {
               <BrandMark size="sm" />
               <span className="text-sm font-bold text-gray-900">{localStorage.getItem('brand_name') || 'SG Pro Growth'}</span>
             </div>
-            <div className="hidden items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 sm:flex">
-              <Icon name="search" size={16} className="text-gray-400" />
-              <input
-                placeholder="Search the portal…"
-                className="w-48 bg-transparent text-sm outline-none placeholder:text-gray-400"
-              />
+            <div className="relative hidden sm:block">
+              <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                <Icon name="search" size={16} className="text-gray-400" />
+                <input
+                  value={query}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setShowResults(true);
+                  }}
+                  onFocus={() => setShowResults(true)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && matches[0]) {
+                      e.preventDefault();
+                      goToMatch(matches[0].path);
+                    }
+                  }}
+                  placeholder="Search the portal…"
+                  className="w-48 bg-transparent text-sm outline-none placeholder:text-gray-400"
+                />
+              </div>
+              {showResults && query.trim() && matches.length > 0 && (
+                <div className="absolute left-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
+                  {matches.map((item) => (
+                    <button
+                      key={`${item.kind}-${item.path}-${item.label}`}
+                      onClick={() => goToMatch(item.path)}
+                      className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-gray-50"
+                    >
+                      <span>
+                        <span className="block font-semibold text-gray-700">{item.label}</span>
+                        <span className="text-xs text-gray-400">{item.group}</span>
+                      </span>
+                      <Icon name="arrow-right" size={14} className="text-gray-400" />
+                    </button>
+                  ))}
+                </div>
+              )}
+              {showResults && query.trim() && matches.length === 0 && (
+                <div className="absolute left-0 top-full z-50 mt-2 w-80 rounded-xl border border-gray-200 bg-white px-3 py-4 text-center text-sm text-gray-400 shadow-lg">
+                  No results for &ldquo;{query.trim()}&rdquo;
+                </div>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -69,6 +192,11 @@ export function Layout() {
             >
               {apiStatus === 'online' ? 'API connected' : apiStatus === 'offline' ? 'API offline' : 'Checking…'}
             </span>
+            {unreadCount > 0 && (
+              <span className="hidden rounded-full bg-brand-600 px-2.5 py-1 text-[11px] font-bold text-white sm:inline-flex">
+                {unreadCount} new
+              </span>
+            )}
             <a
               href="https://sharvaconsulting.com"
               target="_blank"

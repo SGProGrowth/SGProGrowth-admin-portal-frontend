@@ -10,6 +10,7 @@ import { EntityPage } from './pages/EntityPage';
 import { Login } from './pages/Login';
 import { Activity, Calendar, Messages, Payments, Profile, Reports, Settings } from './pages/Simple';
 import { StoreProvider } from './store';
+import { SettingsProvider } from './lib/settings';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   // Admin authorization requires both a session user and a valid (unexpired) JWT.
@@ -19,7 +20,8 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 export default function App() {
   return (
     <ToastProvider>
-      <StoreProvider>
+      <SettingsProvider>
+        <StoreProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
@@ -45,7 +47,8 @@ export default function App() {
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </BrowserRouter>
-      </StoreProvider>
+        </StoreProvider>
+      </SettingsProvider>
     </ToastProvider>
   );
 }

@@ -225,7 +225,7 @@ export const nav: NavGroup[] = [
       { id: 'dashboard', label: 'Dashboard', icon: 'grid' },
       { id: 'activity', label: 'Activity', icon: 'activity' },
       { id: 'calendar', label: 'Calendar', icon: 'calendar' },
-      { id: 'messages', label: 'Messages', icon: 'mail', badge: '2' },
+      { id: 'messages', label: 'Messages', icon: 'mail' },
     ],
   },
   {

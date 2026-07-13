@@ -14,7 +14,7 @@ import {
 import { PageHeader } from '../components/PageHeader';
 import { PageCard, StatCard } from '../components/ui';
 import { Icon } from '../lib/icons';
-import { geoUsers, type GeoUser } from '../lib/insights';
+import type { GeoUser } from '../lib/insights';
 import { apiFetch, isApiEnabled } from '../lib/api';
 
 const CITIES_GEO = [

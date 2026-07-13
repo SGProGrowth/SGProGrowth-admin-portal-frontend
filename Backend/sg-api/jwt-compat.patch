@@ -1,0 +1,17 @@
+diff --git a/backend/src/modules/auth/token.service.ts b/backend/src/modules/auth/token.service.ts
+index 81fdd2c..f83b794 100644
+--- a/backend/src/modules/auth/token.service.ts
++++ b/backend/src/modules/auth/token.service.ts
+@@ -17,6 +17,12 @@ export class TokenService {
+     return this.jwtService.sign(payload, {
+       secret: this.config.get<string>('JWT_ACCESS_SECRET')!,
+       expiresIn: expiresIn as `${number}${'s' | 'm' | 'h' | 'd'}`,
++      // Issuer/audience are set to also satisfy the legacy admin-portal-backend's
++      // requireAuth middleware (jwt.verify with issuer/audience checks), which
++      // shares JWT_ACCESS_SECRET with that service's JWT_SECRET. This lets one
++      // login work for both services without a second auth system.
++      issuer: this.config.get<string>('LEGACY_JWT_ISSUER') ?? 'sgprogrowth-admin',
++      audience: this.config.get<string>('LEGACY_JWT_AUDIENCE') ?? 'sgprogrowth-portal',
+     })
+   }
+ 

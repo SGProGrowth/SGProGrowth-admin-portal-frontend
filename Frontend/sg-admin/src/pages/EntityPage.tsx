@@ -9,6 +9,7 @@ import { entities } from '../data';
 import { initials } from '../lib/auth';
 import { Icon } from '../lib/icons';
 import { useToast } from '../lib/toast';
+import { getCertTemplate } from '../lib/settings';
 import { useStore } from '../store';
 import type { EntityDef, EntityRecord, PromoteConfig } from '../types';
 
@@ -30,6 +31,15 @@ function generateCertificatePdf(row: EntityRecord) {
   const issued = String(row.issued ?? new Date().toISOString().slice(0, 10));
   const certId = String(row.certificateId ?? `SGPRO-${row.id}`);
   const certName = String(row.name ?? 'Certificate of Completion');
+  const template = getCertTemplate();
+  const siteName = localStorage.getItem('brand_name') || 'SG Pro Growth';
+  const primary = localStorage.getItem('brand_primary') || '#1a4d3e';
+  const accent = localStorage.getItem('brand_accent') || '#248f6f';
+
+  const templateBg = template
+    ? `.page { background: url('${template}') center/cover no-repeat; }
+       .border-outer, .border-inner, .watermark { display: none; }`
+    : '';
 
   const html = `<!DOCTYPE html>
 <html>
@@ -41,30 +51,24 @@ function generateCertificatePdf(row: EntityRecord) {
   * { margin:0; padding:0; box-sizing:border-box; }
   body { width:297mm; height:210mm; background:#fff; font-family:'Inter',sans-serif; }
   .page { width:297mm; height:210mm; position:relative; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20mm 22mm; }
-  .border-outer { position:absolute; inset:8mm; border:3px solid #1a4d3e; border-radius:4mm; pointer-events:none; }
-  .border-inner { position:absolute; inset:11mm; border:1px solid #1a4d3e55; border-radius:3mm; pointer-events:none; }
-  .corner { position:absolute; width:12mm; height:12mm; }
-  .corner svg { width:100%; height:100%; }
-  .tl { top:6mm; left:6mm; }
-  .tr { top:6mm; right:6mm; transform:scaleX(-1); }
-  .bl { bottom:6mm; left:6mm; transform:scaleY(-1); }
-  .br { bottom:6mm; right:6mm; transform:scale(-1); }
+  ${templateBg}
+  .border-outer { position:absolute; inset:8mm; border:3px solid ${primary}; border-radius:4mm; pointer-events:none; }
+  .border-inner { position:absolute; inset:11mm; border:1px solid ${primary}55; border-radius:3mm; pointer-events:none; }
   .logo { text-align:center; margin-bottom:6mm; }
-  .logo-text { font-family:'Playfair Display',serif; font-size:18pt; font-weight:700; color:#1a4d3e; letter-spacing:2px; }
-  .logo-sub { font-size:8pt; color:#248f6f; letter-spacing:4px; text-transform:uppercase; margin-top:1mm; }
-  .divider { width:60mm; height:0.5px; background:linear-gradient(to right,transparent,#1a4d3e,transparent); margin:4mm auto; }
+  .logo-text { font-family:'Playfair Display',serif; font-size:18pt; font-weight:700; color:${primary}; letter-spacing:2px; }
+  .logo-sub { font-size:8pt; color:${accent}; letter-spacing:4px; text-transform:uppercase; margin-top:1mm; }
+  .divider { width:60mm; height:0.5px; background:linear-gradient(to right,transparent,${primary},transparent); margin:4mm auto; }
   .presents { font-size:9pt; color:#64748b; text-align:center; letter-spacing:2px; text-transform:uppercase; margin-bottom:3mm; }
-  h1 { font-family:'Playfair Display',serif; font-size:28pt; color:#1a4d3e; text-align:center; margin-bottom:3mm; }
-  .cert-label { font-size:9pt; color:#64748b; text-align:center; letter-spacing:2px; text-transform:uppercase; margin-bottom:5mm; }
-  .student-name { font-family:'Playfair Display',serif; font-size:36pt; font-weight:700; color:#0f2d1f; text-align:center; line-height:1.1; margin-bottom:5mm; border-bottom:2px solid #1a4d3e; padding-bottom:3mm; min-width:180mm; }
+  .student-name { font-family:'Playfair Display',serif; font-size:36pt; font-weight:700; color:#0f2d1f; text-align:center; line-height:1.1; margin-bottom:5mm; border-bottom:2px solid ${primary}; padding-bottom:3mm; min-width:180mm; }
   .for-text { font-size:9pt; color:#64748b; text-align:center; letter-spacing:1px; margin-bottom:2mm; }
-  .course-name { font-family:'Playfair Display',serif; font-size:16pt; color:#1a4d3e; text-align:center; margin-bottom:6mm; font-style:italic; }
+  .course-name { font-family:'Playfair Display',serif; font-size:16pt; color:${primary}; text-align:center; margin-bottom:6mm; font-style:italic; }
   .meta { display:flex; justify-content:space-between; width:100%; margin-top:6mm; }
   .meta-item { text-align:center; flex:1; }
   .meta-label { font-size:7pt; color:#94a3b8; text-transform:uppercase; letter-spacing:2px; display:block; margin-bottom:1mm; }
   .meta-value { font-size:9pt; font-weight:600; color:#334155; }
   .sig-line { width:40mm; height:0.5px; background:#334155; margin:0 auto 1mm; }
-  .watermark { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0.03; font-family:'Playfair Display',serif; font-size:80pt; font-weight:700; color:#1a4d3e; pointer-events:none; transform:rotate(-30deg); }
+  .watermark { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0.03; font-family:'Playfair Display',serif; font-size:80pt; font-weight:700; color:${primary}; pointer-events:none; transform:rotate(-30deg); }
+  .content { position:relative; z-index:1; width:100%; display:flex; flex-direction:column; align-items:center; }
   @media print { body{-webkit-print-color-adjust:exact; print-color-adjust:exact;} }
 </style>
 </head>
@@ -73,9 +77,9 @@ function generateCertificatePdf(row: EntityRecord) {
   <div class="border-outer"></div>
   <div class="border-inner"></div>
   <div class="watermark">SG PRO</div>
-
+  <div class="content">
   <div class="logo">
-    <div class="logo-text">SG Pro Growth</div>
+    <div class="logo-text">${siteName}</div>
     <div class="logo-sub">Professional Learning Platform</div>
   </div>
   <div class="divider"></div>
@@ -92,13 +96,14 @@ function generateCertificatePdf(row: EntityRecord) {
     <div class="meta-item">
       <span class="meta-label">Issued by</span>
       <div class="sig-line"></div>
-      <span class="meta-value">Mahesh MD</span>
+      <span class="meta-value">${siteName}</span>
     </div>
     <div class="meta-item">
       <span class="meta-label">Date of Issue</span>
       <div class="sig-line"></div>
       <span class="meta-value">${issued}</span>
     </div>
+  </div>
   </div>
 </div>
 <script>window.onload=function(){window.print();}</script>
